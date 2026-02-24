@@ -1,0 +1,96 @@
+/* ==============================
+   ABOUT PAGE STYLES
+   ============================== */
+
+/* Main container */
+main {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* Section titles */
+main h1,
+main h3 {
+  color: #1e7e34; /* subtle green accent matching “success” tone */
+}
+
+/* Lead paragraph */
+main .lead {
+  font-size: 1.1rem;
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* Section spacing */
+main section {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Image styling */
+main img {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 0.75rem;
+}
+
+main img:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Bullet list */
+main ul {
+  margin-top: 1rem;
+  line-height: 1.8;
+}
+
+main ul li {
+  font-size: 1rem;
+  color: #444;
+}
+
+/* Payment icons row */
+main .d-flex img {
+  filter: grayscale(20%);
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+main .d-flex img:hover {
+  transform: scale(1.1);
+  filter: grayscale(0%);
+}
+
+/* Light section (final call-to-action) */
+main .bg-light {
+  background: linear-gradient(135deg, #f5fdf7 0%, #e8f9ee 100%);
+  border: 1px solid #d4edda;
+}
+
+/* Button customization */
+main .btn-success {
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+main .btn-success:hover {
+  background-color: #155d27;
+  transform: translateY(-2px);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  main .row {
+    text-align: center;
+  }
+
+  main .col-md-6 img {
+    margin-bottom: 1.5rem;
+  }
+
+  main h3 {
+    margin-top: 1rem;
+  }
+}

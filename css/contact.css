@@ -1,0 +1,84 @@
+/* ==============================
+   CONTACT PAGE STYLES
+   ============================== */
+
+main {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+main h1,
+main h3,
+main h4 {
+  color: #1e7e34;
+}
+
+main .lead {
+  font-size: 1.1rem;
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+main section {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Contact Card */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 1rem;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Controls */
+.form-control {
+  border-radius: 0.6rem;
+  border: 1px solid #c3e6cb;
+  box-shadow: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.2);
+}
+
+/* Buttons */
+.btn-success {
+  padding: 0.75rem;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  background-color: #155d27;
+  transform: translateY(-2px);
+}
+
+/* Light Background Section */
+main .bg-light {
+  background: linear-gradient(135deg, #f5fdf7 0%, #e8f9ee 100%);
+  border: 1px solid #d4edda;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  main .row {
+    text-align: center;
+  }
+
+  main .col-md-5 {
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    box-shadow: none;
+  }
+}

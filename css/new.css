@@ -1,0 +1,608 @@
+/* new.css - Enhanced UI/UX */
+
+:root {
+  --green: #28a745;
+  --green-hover: #218838;
+  --dark: #212529;
+  --light: #f8f9fa;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-attachment: fixed;
+  color: var(--dark);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* ===============================
+   HEADER
+================================= */
+header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1rem 0;
+  border-bottom: 2px solid rgba(40, 167, 69, 0.1);
+}
+
+header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0 1.5rem;
+}
+
+header .brand {
+  font-weight: 700;
+  font-size: 1.75rem;
+  color: var(--green);
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+  transition: var(--transition);
+}
+
+header .brand:hover {
+  transform: scale(1.05);
+  text-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+header nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+header nav a {
+  color: var(--dark);
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  transition: var(--transition);
+  border-radius: var(--radius-sm);
+  position: relative;
+}
+
+header nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--green);
+  transition: var(--transition);
+  transform: translateX(-50%);
+}
+
+header nav a:hover {
+  color: var(--green);
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+header nav a:hover::after {
+  width: 80%;
+}
+
+header nav .btn {
+  border-radius: var(--radius);
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  transition: var(--transition);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+header nav .btn-outline-success {
+  border: 2px solid var(--green);
+  color: var(--green);
+  background: white;
+}
+
+header nav .btn-outline-success:hover {
+  background: var(--green);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+}
+
+header nav .btn-success {
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-hover) 100%);
+  border: none;
+  color: white;
+}
+
+header nav .btn-success:hover {
+  background: linear-gradient(135deg, var(--green-hover) 0%, var(--green) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+}
+
+/* ===============================
+   HERO SECTION
+================================= */
+.hero {
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  border-radius: var(--radius);
+  margin: 2rem auto;
+  max-width: 1200px;
+  box-shadow: var(--shadow);
+}
+
+.hero h1 {
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 2.75rem;
+  color: var(--green);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.hero p {
+  color: #6c757d;
+  max-width: 650px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===============================
+   UNITS CONTAINER
+================================= */
+#unitsContainer {
+  margin-top: 2rem;
+}
+
+/* ===============================
+   RENTAL CARDS
+================================= */
+.rental-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  position: relative;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.rental-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--green) 0%, var(--green-hover) 100%);
+  transform: scaleX(0);
+  transition: var(--transition);
+}
+
+.rental-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-hover);
+}
+
+.rental-card:hover::before {
+  transform: scaleX(1);
+}
+
+.rental-card img {
+  height: 220px;
+  width: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.rental-card:hover img {
+  transform: scale(1.1);
+}
+
+.rental-card .card-body {
+  padding: 1.5rem;
+}
+
+.rental-card h5 {
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--dark);
+  font-size: 1.25rem;
+}
+
+.rental-card p {
+  color: #6c757d;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.rental-card .price {
+  color: var(--green);
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.rental-card button {
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-hover) 100%);
+  border: none;
+  color: white;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  width: 100%;
+  transition: var(--transition);
+  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+  font-size: 1rem;
+}
+
+.rental-card button:hover {
+  background: linear-gradient(135deg, var(--green-hover) 0%, var(--green) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+}
+/* Premium Rental Cards */
+.card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+
+/* ===============================
+   EMPTY STATE
+================================= */
+#unitsEmpty {
+  color: #6c757d;
+  margin: 3rem auto;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 600px;
+  font-size: 1.1rem;
+}
+
+#unitsEmpty::before {
+  content: "🏠";
+  display: block;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* ===============================
+   UNIT DETAILS & REVIEWS
+================================= */
+.unit-details {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.unit-details h4,
+.unit-details h6 {
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.unit-details ul {
+  list-style: none;
+  padding: 0;
+}
+
+.unit-details ul li {
+  margin-bottom: 0.75rem;
+  padding-left: 1.75rem;
+  position: relative;
+  color: #333;
+  transition: var(--transition);
+}
+
+.unit-details ul li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--green);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.unit-details ul li:hover {
+  transform: translateX(5px);
+  color: var(--green);
+}
+
+.unit-reviews {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.unit-reviews .badge {
+  font-size: 1rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.unit-reviews .border {
+  border: 2px solid #e9ecef !important;
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  transition: var(--transition);
+}
+
+.unit-reviews .border:hover {
+  border-color: var(--green) !important;
+  box-shadow: var(--shadow);
+  transform: translateY(-3px);
+}
+
+/* ===============================
+   FOOTER
+================================= */
+footer {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  text-align: center;
+  padding: 1.5rem 1rem;
+  margin-top: 4rem;
+  border-top: 2px solid rgba(40, 167, 69, 0.1);
+  font-size: 0.95rem;
+  color: #6c757d;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+}
+
+footer small {
+  font-weight: 500;
+}
+
+/* ===============================
+   RESPONSIVE DESIGN
+================================= */
+
+/* Tablet (768px - 991px) */
+@media (max-width: 991px) {
+  header .container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  header nav {
+    justify-content: center;
+  }
+
+  .hero {
+    padding: 3rem 1.25rem 2.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.25rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  #unitsContainer {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .rental-card img {
+    height: 200px;
+  }
+}
+
+/* Mobile (max 767px) */
+@media (max-width: 767px) {
+  header .brand {
+    font-size: 1.5rem;
+  }
+
+  header nav {
+    width: 100%;
+    justify-content: center;
+  }
+
+  header nav a {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  header nav .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .hero {
+    padding: 2.5rem 1rem 2rem;
+    margin: 1rem;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+    max-width: 100%;
+  }
+
+  #unitsContainer {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 0 0.75rem;
+    margin: 1.5rem auto;
+  }
+
+  .rental-card {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .rental-card img {
+    height: 180px;
+  }
+
+  .rental-card .card-body {
+    padding: 1.25rem;
+  }
+
+  .rental-card h5 {
+    font-size: 1.1rem;
+  }
+
+  .rental-card .price {
+    font-size: 1.15rem;
+  }
+
+  .rental-card button {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .unit-details,
+  .unit-reviews {
+    padding: 1.5rem;
+  }
+
+  #unitsEmpty {
+    padding: 2rem 1rem;
+    margin: 2rem 1rem;
+    font-size: 1rem;
+  }
+
+  #unitsEmpty::before {
+    font-size: 3rem;
+  }
+
+  footer {
+    padding: 1.25rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Small Mobile (max 480px) */
+@media (max-width: 480px) {
+  header .brand {
+    font-size: 1.35rem;
+  }
+
+  header nav a {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero p {
+    font-size: 0.9rem;
+  }
+
+  .rental-card img {
+    height: 160px;
+  }
+
+  .rental-card h5 {
+    font-size: 1rem;
+  }
+
+  .rental-card .price {
+    font-size: 1.05rem;
+  }
+}
+
+/* ===============================
+   ANIMATIONS & INTERACTIONS
+================================= */
+@media (prefers-reduced-motion: no-preference) {
+  .rental-card {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .rental-card:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .rental-card:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+
+  .rental-card:nth-child(4) {
+    animation-delay: 0.3s;
+  }
+}
+
+/* Loading state for cards */
+.rental-card.loading {
+  pointer-events: none;
+  opacity: 0.6;
+  position: relative;
+}
+
+.rental-card.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  to {
+    left: 100%;
+  }
+}

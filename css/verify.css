@@ -1,0 +1,68 @@
+/* frontend/css/verify.css */
+
+body {
+  font-family: "Poppins", Arial, sans-serif;
+  background: #f6f9f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.verify-container {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px 50px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  border-top: 5px solid #009e60; /* your brand green */
+}
+
+.verify-container h2 {
+  color: #009e60;
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+}
+
+#verifyMessage {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+#verifyMessage.success {
+  color: #009e60;
+}
+
+#verifyMessage.error {
+  color: #d9534f;
+}
+
+#loginLink {
+  display: inline-block;
+  padding: 10px 18px;
+  background: #009e60;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+  font-weight: 500;
+}
+
+#loginLink:hover {
+  background: #007a4b;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .verify-container {
+    padding: 30px 25px;
+  }
+
+  .verify-container h2 {
+    font-size: 1.5rem;
+  }
+}

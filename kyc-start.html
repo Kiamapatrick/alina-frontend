@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+
+  <title>Identity Verification - Alina 906 Vibes//Kyc_start</title>
+<style>
+  :root {
+    --primary: #10b981;
+    --primary-dark: #047857;
+    --primary-soft: #ecfdf5;
+    --text-main: #065f46;
+    --text-muted: #047857;
+    --white: #ffffff;
+    --shadow-lg: 0 25px 70px rgba(0, 0, 0, 0.22);
+    --shadow-sm: 0 6px 20px rgba(16, 185, 129, 0.35);
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+  }
+
+  .container {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 48px 40px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: fadeUp 0.6s ease-out;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .success-icon {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    animation: scaleIn 0.45s ease-out;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .success-icon svg {
+    width: 34px;
+    height: 34px;
+    stroke: var(--white);
+    stroke-width: 3;
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  h1 {
+    font-size: 28px;
+    color: var(--text-main);
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+    line-height: 1.65;
+  }
+
+  .info-box {
+    background: var(--primary-soft);
+    border-radius: var(--radius-md);
+    padding: 26px;
+    margin-bottom: 36px;
+    text-align: left;
+    border: 1px solid rgba(16, 185, 129, 0.15);
+  }
+
+  .info-box h3 {
+    font-size: 16px;
+    color: var(--text-main);
+    margin-bottom: 18px;
+    font-weight: 600;
+  }
+
+  .info-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .info-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-item svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    stroke: var(--primary);
+    stroke-width: 2;
+    margin-top: 3px;
+  }
+
+  .info-item span {
+    font-size: 14px;
+    color: var(--text-main);
+    line-height: 1.55;
+  }
+
+  .btn {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    border: none;
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(16, 185, 129, 0.45);
+  }
+
+  .btn:focus-visible {
+    outline: 3px solid rgba(16, 185, 129, 0.4);
+    outline-offset: 2px;
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .loader {
+    display: none;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .loading .btn {
+    display: none;
+  }
+
+  .loading .loader {
+    display: block;
+  }
+
+  .error {
+    background: #ecfdf5;
+    color: var(--text-main);
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 22px;
+    font-size: 14px;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    display: none;
+  }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+  <div class="success-icon">
+    <svg fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  </div>
+
+  <h1>Email Verified! 🎉</h1>
+  <p class="subtitle">
+    Great! Your email is confirmed. Now let's verify your identity to unlock full access to Alina 906 Vibes.
+  </p>
+
+  <div class="info-box">
+    <h3>What you'll need:</h3>
+    <div class="info-item">
+      <svg fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <span>A valid government-issued ID (passport, driver's license, or national ID)</span>
+    </div>
+    <div class="info-item">
+      <svg fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span>A device with a camera (phone, tablet, or webcam)</span>
+    </div>
+    <div class="info-item">
+      <svg fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>About 3-5 minutes to complete the process</span>
+    </div>
+  </div>
+
+  <div class="error" id="errorMsg"></div>
+
+  <button class="btn" id="startBtn">Start Verification</button>
+  <div class="loader" id="loader"></div>
+</div>
+
+<script>
+  // Get parameters from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const jwtToken = urlParams.get('token');
+  const userId = urlParams.get('uid');
+
+  // Configuration - UPDATE THIS WITH YOUR BACKEND URL
+const API_BASE = "https://alina906vibes-backend.onrender.com";
+
+  const startBtn = document.getElementById('startBtn');
+  const loader = document.getElementById('loader');
+  const errorMsg = document.getElementById('errorMsg');
+  const container = document.querySelector('.container');
+
+  // Validate tokens
+  if (!jwtToken || !userId) {
+    showError('Missing authentication. Please sign up again.');
+    startBtn.disabled = true;
+  }
+
+  function showError(message) {
+    errorMsg.textContent = message;
+    errorMsg.style.display = 'block';
+  }
+
+  function hideError() {
+    errorMsg.style.display = 'none';
+  }
+
+  async function startVerification() {
+    hideError();
+    container.classList.add('loading');
+    startBtn.disabled = true;
+
+    try {
+      // Call backend to create Veriff session
+      const response = await fetch(`${API_BASE}/api/kyc/didit/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtToken}`
+        }
+        // REMOVED: body with userId (now from JWT)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to start verification');
+      }
+      localStorage.setItem('authToken', jwtToken);
+      localStorage.setItem('userId', userId);
+      // Redirect to Veriff's hosted verification page
+      window.location.href = data.sessionUrl;
+
+    } catch (error) {
+      console.error('Error starting verification:', error);
+      showError(error.message || 'Failed to start verification. Please try again.');
+      container.classList.remove('loading');
+      startBtn.disabled = false;
+    }
+  }
+
+  startBtn.addEventListener('click', startVerification);
+</script>
+
+</body>
+</html>

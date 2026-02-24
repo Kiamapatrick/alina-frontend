@@ -1,0 +1,124 @@
+/* =======================
+   Body & Font
+======================= */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* =======================
+   Card Styling
+======================= */
+.card {
+  border-radius: 12px;
+  border: none;
+  background-color: #ffffff;
+  padding: 2rem 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Card title */
+.card-title {
+  font-weight: 600;
+  color: #333333;
+}
+
+/* Paragraphs inside card */
+.card p {
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+/* =======================
+   Table Styling
+======================= */
+#kycTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.5rem;
+}
+
+#kycTable th,
+#kycTable td {
+  vertical-align: middle;
+  text-align: center;
+  padding: 0.75rem;
+  border-top: none;
+  border-bottom: none;
+}
+
+#kycTable th {
+  font-weight: 600;
+  color: #555555;
+  background-color: #f1f3f5;
+}
+
+#kycTable tbody tr {
+  background-color: #ffffff;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+}
+
+#kycTable tbody tr:hover {
+  background-color: #e9f5ee;
+  transform: translateY(-1px);
+}
+
+/* Links to view documents */
+#kycTable a {
+  color: #198754;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+#kycTable a:hover {
+  text-decoration: underline;
+}
+
+/* Action buttons */
+#kycBody button {
+  border-radius: 6px;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.65rem;
+  margin: 0 0.15rem;
+  transition: transform 0.2s ease;
+}
+
+#kycBody .approve {
+  background-color: #198754;
+  border-color: #198754;
+  color: #ffffff;
+}
+
+#kycBody .approve:hover {
+  background-color: #157347;
+  transform: translateY(-2px);
+}
+
+#kycBody .reject {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #ffffff;
+}
+
+#kycBody .reject:hover {
+  background-color: #b02a37;
+  transform: translateY(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+  .card {
+    padding: 2rem 1rem;
+  }
+  #kycTable th,
+  #kycTable td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+  #kycBody button {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}
