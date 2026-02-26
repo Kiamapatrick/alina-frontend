@@ -6,15 +6,17 @@
 
 /* ─── Extra tokens (extend booking2.css vars) ─── */
 :root {
-    --cal-range-bg: rgba(25, 135, 84, 0.10);
-    --cal-range-text: #0f5132;
-    --cal-selected-bg: #198754;
+    --cal-range-bg: rgba(37, 99, 235, 0.10);
+    --cal-range-text: #1e3a8a;
+    --cal-selected-bg: #2563eb;
     --cal-selected-text: #ffffff;
-    --cal-blocked-bg: #f7f7f8;
-    --cal-blocked-text: #c4cad4;
+    --cal-booked-bg: #dc2626;
+    --cal-booked-bg-hover: #b91c1c;
+    --cal-booked-text: #ffffff;
+    --cal-booked-glow: rgba(220, 38, 38, 0.25);
     --cal-past-text: #d1d5db;
-    --cal-hover-bg: rgba(25, 135, 84, 0.07);
-    --cal-today-ring: rgba(25, 135, 84, 0.40);
+    --cal-hover-bg: rgba(37, 99, 235, 0.07);
+    --cal-today-ring: rgba(37, 99, 235, 0.40);
 }
 
 
@@ -24,7 +26,8 @@
    ══════════════════════════════════════════════════════ */
 
 /* Reset base cell */
-#calendar .calendar-day {
+#calendar .calendar-day,
+.enh-days .calendar-day {
     position: relative;
     aspect-ratio: 1;
     display: flex;
@@ -46,70 +49,83 @@
 }
 
 /* ── Available ── */
-#calendar .calendar-day.available {
+#calendar .calendar-day.available,
+.enh-days .calendar-day.available {
     cursor: pointer;
     background: var(--b-white);
     color: var(--b-dark);
 }
 
-#calendar .calendar-day.available:hover {
-    background: var(--b-accent);
-    color: var(--b-primary);
+#calendar .calendar-day.available:hover,
+.enh-days .calendar-day.available:hover {
+    background: rgba(37, 99, 235, 0.07);
+    color: #1d4ed8;
     transform: scale(1.09);
     font-weight: 700;
-    box-shadow: 0 2px 10px var(--b-primary-glow);
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.22);
     z-index: 2;
 }
 
 /* ── Today highlight ── */
-#calendar .calendar-day.today {
+#calendar .calendar-day.today,
+.enh-days .calendar-day.today {
     box-shadow: inset 0 0 0 1.5px var(--cal-today-ring);
     font-weight: 700;
 }
 
 /* ── Past ── */
-#calendar .calendar-day.past {
+#calendar .calendar-day.past,
+.enh-days .calendar-day.past {
     color: var(--cal-past-text);
     cursor: not-allowed;
     background: transparent;
 }
 
-/* ── Blocked / booked — muted, not aggressive ── */
-#calendar .calendar-day.booked {
-    background: var(--cal-blocked-bg);
-    color: var(--cal-blocked-text);
-    cursor: not-allowed;
+/* ── Blocked / booked — bold premium red ── */
+#calendar .calendar-day.booked,
+.enh-days .calendar-day.booked {
+    background: var(--cal-booked-bg) !important;
+    color: var(--cal-booked-text) !important;
+    cursor: not-allowed !important;
+    font-weight: 700;
+    border-radius: 8px;
     text-decoration: none;
-    /* remove old strikethrough */
+    transform: none !important;
+    box-shadow: 0 2px 8px var(--cal-booked-glow) !important;
+    opacity: 0.92;
+    z-index: 1;
 }
 
-/* Subtle hatching overlay — minimal */
-#calendar .calendar-day.booked::after {
+/* Strikethrough line to signal unavailability */
+#calendar .calendar-day.booked::after,
+.enh-days .calendar-day.booked::after {
     content: '';
     position: absolute;
-    inset: 5px;
-    border-radius: 4px;
-    background: repeating-linear-gradient(-45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.05) 2px,
-            rgba(0, 0, 0, 0.05) 3px);
+    left: 18%;
+    right: 18%;
+    top: 50%;
+    height: 1.5px;
+    background: rgba(255, 255, 255, 0.55);
+    transform: translateY(-50%);
+    border-radius: 2px;
     pointer-events: none;
 }
 
-/* ── Selected range fill (between check-in and check-out) ── */
-#calendar .calendar-day.cal-selected {
+/* ── Selected range fill — blue ── */
+#calendar .calendar-day.cal-selected,
+.enh-days .calendar-day.cal-selected {
     background: var(--cal-selected-bg);
     color: var(--cal-selected-text);
     font-weight: 700;
     transform: scale(1.05);
-    box-shadow: 0 3px 12px var(--b-primary-glow);
+    box-shadow: 0 3px 12px rgba(37, 99, 235, 0.32);
     z-index: 3;
     border-radius: 8px;
 }
 
 /* Range middle cells */
-#calendar .calendar-day.cal-range {
+#calendar .calendar-day.cal-range,
+.enh-days .calendar-day.cal-range {
     background: var(--cal-range-bg);
     color: var(--cal-range-text);
     border-radius: 0;
@@ -119,25 +135,30 @@
 }
 
 /* Check-in cap */
-#calendar .calendar-day.cal-start {
+#calendar .calendar-day.cal-start,
+.enh-days .calendar-day.cal-start {
     border-radius: 8px 0 0 8px;
 }
 
 /* Check-out cap */
-#calendar .calendar-day.cal-end {
+#calendar .calendar-day.cal-end,
+.enh-days .calendar-day.cal-end {
     border-radius: 0 8px 8px 0;
 }
 
 /* Only one day selected — fully rounded */
 #calendar .calendar-day.cal-start.cal-end,
-#calendar .calendar-day.cal-selected:not(.cal-range) {
+#calendar .calendar-day.cal-selected:not(.cal-range),
+.enh-days .calendar-day.cal-start.cal-end,
+.enh-days .calendar-day.cal-selected:not(.cal-range) {
     border-radius: 8px;
 }
 
 /* ── Hover preview while choosing check-out ── */
-#calendar .calendar-day.cal-hover {
+#calendar .calendar-day.cal-hover,
+.enh-days .calendar-day.cal-hover {
     background: var(--cal-hover-bg);
-    color: var(--b-primary);
+    color: #1d4ed8;
     border-radius: 0;
 }
 
@@ -156,12 +177,14 @@
     }
 }
 
-#calendar .calendar-day.just-popped {
+#calendar .calendar-day.just-popped,
+.enh-days .calendar-day.just-popped {
     animation: calPop 0.26s var(--b-ease) forwards;
 }
 
 /* ─── Empty filler cells ─── */
-#calendar .calendar-day.other-month {
+#calendar .calendar-day.other-month,
+.enh-days .calendar-day.other-month {
     visibility: hidden;
     pointer-events: none;
 }
@@ -257,17 +280,9 @@
     gap: 2px;
 }
 
-/* Hide second panel on mobile */
+/* Mobile: JS skips rendering the second panel at <768px, sep also never added */
 @media (max-width: 767px) {
-    .enh-cal-wrap {
-        flex-direction: column;
-    }
-
     .enh-cal-sep {
-        display: none;
-    }
-
-    .enh-cal-panel.enh-panel-next {
         display: none;
     }
 }

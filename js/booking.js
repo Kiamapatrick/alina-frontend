@@ -526,7 +526,21 @@ async function loadCalendar() {
     console.log('📅 Calendar data:', data);
     console.log('📅 Number of bookings:', data.bookings?.length || 0);
 
-    renderCalendar(data.bookings || []);
+    const bookings = data.bookings || [];
+
+    // Render the legacy #calendar grid (booking.js's own handler)
+    renderCalendar(bookings);
+
+    // Notify the enhanced calendar (calendar-enhanced.js) so it can
+    // mark booked dates in the dual-month UI it manages.
+    // calendar-enhanced.js sets window.renderCalendar; calling it here
+    // passes the same bookings data so bookedSet is always populated.
+    if (typeof window.renderCalendar === 'function') {
+      window.renderCalendar(bookings);
+    }
+
+    // Also cache globally so calendar-enhanced can re-sync on month nav
+    window._calendarBookings = bookings;
   } catch (err) {
     console.error('Calendar fetch error:', err);
   }

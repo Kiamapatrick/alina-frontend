@@ -9,6 +9,8 @@
 :root {
     --nav-height: 72px;
     --nav-height-scrolled: 56px;
+    --nav-height-mobile: 96px;
+    /* two-row height */
     --nav-bg: rgba(255, 255, 255, 0.78);
     --nav-bg-scrolled: rgba(255, 255, 255, 0.95);
     --nav-blur: 20px;
@@ -358,32 +360,50 @@
 }
 
 .avatar-btn {
-    width: 38px;
     height: 38px;
-    border-radius: 50%;
-    border: 2px solid var(--accent);
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--accent);
     background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
     transition: all var(--transition-fast);
-    padding: 0;
+    padding: 3px 14px 3px 4px;
     box-shadow: 0 2px 8px var(--accent-glow);
 }
 
 .avatar-btn:hover {
-    transform: scale(1.08);
+    transform: translateY(-1px);
     box-shadow: 0 4px 16px var(--accent-glow);
 }
 
 .avatar-initials {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'Inter', system-ui, sans-serif;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-white);
     line-height: 1;
     text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.avatar-name {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--text-white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
 }
 
 /* Dropdown menu */
@@ -631,33 +651,134 @@ body {
     padding-top: var(--nav-height);
 }
 
-/* prevent scroll when overlay is open */
-body.menu-open {
-    overflow: hidden;
+@media (max-width: 991px) {
+    body {
+        padding-top: var(--nav-height-mobile);
+    }
 }
 
+
 /* ═══════════════════════════════════════════
-   RESPONSIVE — Show mobile toggle ≤ 991px
+   RESPONSIVE — Mobile ≤ 991px
+   Two-row inline navbar — NO hamburger
    ═══════════════════════════════════════════ */
 @media (max-width: 991px) {
-    .navbar-links {
-        display: none;
+
+    /* Taller nav to fit two rows */
+    .alina-navbar {
+        height: var(--nav-height-mobile);
     }
 
-    .navbar-actions {
-        display: none;
+    .alina-navbar.navbar-scrolled {
+        height: var(--nav-height-mobile);
     }
 
-    .mobile-toggle {
-        display: flex;
-    }
-
+    /* Stack inner into two rows */
     .navbar-inner {
-        padding: 0 16px;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
+        padding: 6px 14px 0;
+        gap: 0;
+        height: 100%;
+    }
+
+    /* ── Row 1: Logo + nav links ── */
+    .navbar-row1 {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 48px;
+        flex-shrink: 0;
+    }
+
+    /* Nav links inline in row 1 (no absolute centering) */
+    .navbar-links {
+        display: flex !important;
+        position: static;
+        transform: none;
+        gap: 0;
+    }
+
+    .navbar-links a {
+        font-size: 0.78rem;
+        padding: 6px 10px;
     }
 
     .navbar-logo {
-        font-size: 1.2rem;
+        font-size: 1.05rem;
+        flex-shrink: 0;
+    }
+
+    /* ── Row 2: Auth + Wallet ── */
+    .navbar-row2 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 40px;
+        flex-shrink: 0;
+        padding-bottom: 4px;
+        width: 100%;
+    }
+
+    /* Show desktop actions in row 2 */
+    .navbar-actions {
+        display: flex !important;
+        gap: 6px;
+        width: 100%;
+    }
+
+    /* Compact buttons on mobile */
+    .nav-btn {
+        font-size: 0.72rem;
+        padding: 5px 12px;
+    }
+
+    .wallet-connect-btn {
+        font-size: 0.72rem;
+        padding: 5px 11px;
+    }
+
+    .wallet-addr {
+        font-size: 0.7rem;
+    }
+
+    .wallet-connected {
+        padding: 4px 9px 4px 8px;
+    }
+
+    /* Hide welcome text label on very small screens (≤380px) */
+    .nav-welcome-text {
+        max-width: 90px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Hide hamburger toggle completely */
+    .mobile-toggle {
+        display: none !important;
+    }
+
+    /* Avatar dropdown stays visible */
+    .avatar-area {
+        margin-left: auto;
+    }
+
+    .avatar-btn {
+        height: 36px;
+        padding: 3px 12px 3px 3px;
+    }
+
+    .avatar-initials {
+        width: 26px;
+        height: 26px;
+        font-size: 0.7rem;
+    }
+
+    .avatar-name {
+        font-size: 0.75rem;
+        max-width: 90px;
     }
 }
 
@@ -669,6 +790,27 @@ body.menu-open {
     .mobile-toggle {
         display: none !important;
     }
+
+    /* Restore single-row layout */
+    .navbar-row1,
+    .navbar-row2 {
+        display: contents;
+        /* children participate in flex normally */
+    }
+}
+
+/* ─── Welcome greeting (mobile row 2) ─── */
+.nav-welcome {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    display: none;
+    /* shown via JS when logged in on mobile */
 }
 
 /* ═══════════════════════════════════════════

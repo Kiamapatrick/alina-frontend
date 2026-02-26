@@ -1,4 +1,5 @@
-// nav.js — Premium Navbar: auth, wallet, avatar, mobile overlay, scroll, active links
+// nav.js — Premium Navbar: auth, wallet, avatar, scroll, active links
+// Mobile: two-row inline layout (NO hamburger/overlay)
 (function () {
   'use strict';
 
@@ -36,6 +37,20 @@
     return name[0].toUpperCase();
   }
 
+  function getUserFirstName(token) {
+    const payload = decodeJwt(token);
+    if (!payload) return null;
+    const name = payload.name || payload.userName || '';
+    if (!name) return null;
+    return name.trim().split(/\s+/)[0]; // first word only
+  }
+
+  function getUserFullName(token) {
+    const payload = decodeJwt(token);
+    if (!payload) return 'User';
+    return payload.name || payload.userName || payload.email || 'User';
+  }
+
   function getUserId(token) {
     const payload = decodeJwt(token);
     return payload ? (payload.id || payload._id || payload.userId || null) : null;
@@ -46,39 +61,33 @@
     const token = localStorage.getItem('userToken');
     const loggedIn = token && isTokenValid(token);
 
-    // Desktop auth buttons
     const loginBtn = document.getElementById('loginLink');
     const signupBtn = document.getElementById('signupLink');
     const avatarDropdown = document.getElementById('avatarDropdown');
     const avatarInitials = document.getElementById('avatarInitials');
-
-    // Mobile auth
-    const mobileLoginLink = document.getElementById('mobileLoginLink');
-    const mobileSignupLink = document.getElementById('mobileSignupLink');
-    const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+    const avatarName = document.getElementById('avatarName');
+    const navWelcome = document.getElementById('navWelcome');
 
     if (loggedIn) {
       if (loginBtn) loginBtn.style.display = 'none';
       if (signupBtn) signupBtn.style.display = 'none';
       if (avatarDropdown) avatarDropdown.style.display = '';
       if (avatarInitials) avatarInitials.textContent = getUserInitials(token);
+      if (avatarName) avatarName.textContent = getUserFullName(token);
 
-      // Mobile
-      if (mobileLoginLink) mobileLoginLink.style.display = 'none';
-      if (mobileSignupLink) mobileSignupLink.style.display = 'none';
-      if (mobileLogoutBtn) mobileLogoutBtn.style.display = '';
+      // Show "Welcome, Name" on mobile row 2
+      if (navWelcome) {
+        const firstName = getUserFirstName(token);
+        navWelcome.textContent = firstName ? `Hi, ${firstName}` : 'Welcome';
+        navWelcome.style.display = ''; // keeping this for backwards compatibility, but might be redundant now
+      }
 
-      // Fetch KYC status
       fetchKycStatus(token);
     } else {
       if (loginBtn) loginBtn.style.display = '';
       if (signupBtn) signupBtn.style.display = '';
       if (avatarDropdown) avatarDropdown.style.display = 'none';
-
-      // Mobile
-      if (mobileLoginLink) mobileLoginLink.style.display = '';
-      if (mobileSignupLink) mobileSignupLink.style.display = '';
-      if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'none';
+      if (navWelcome) navWelcome.style.display = 'none';
     }
   }
 
@@ -98,19 +107,15 @@
       const data = await res.json();
       const status = (data.kycStatus || 'none').toLowerCase();
 
-      badge.className = 'kyc-badge'; // reset
+      badge.className = 'kyc-badge';
       if (status === 'approved' || status === 'verified') {
-        badge.textContent = 'Verified';
-        badge.classList.add('kyc-approved');
+        badge.textContent = 'Verified'; badge.classList.add('kyc-approved');
       } else if (status === 'pending' || status === 'processing') {
-        badge.textContent = 'Pending';
-        badge.classList.add('kyc-pending');
-      } else if (status === 'rejected' || status === 'declined' || status === 'failed') {
-        badge.textContent = 'Rejected';
-        badge.classList.add('kyc-rejected');
+        badge.textContent = 'Pending'; badge.classList.add('kyc-pending');
+      } else if (['rejected', 'declined', 'failed'].includes(status)) {
+        badge.textContent = 'Rejected'; badge.classList.add('kyc-rejected');
       } else {
-        badge.textContent = 'Not Started';
-        badge.classList.add('kyc-none');
+        badge.textContent = 'Not Started'; badge.classList.add('kyc-none');
       }
     } catch {
       badge.textContent = '—';
@@ -129,56 +134,50 @@
       menu.classList.toggle('open');
     });
 
-    // Close on outside click
     document.addEventListener('click', (e) => {
       if (!menu.contains(e.target) && !toggle.contains(e.target)) {
         menu.classList.remove('open');
       }
     });
 
-    // Close on Escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') menu.classList.remove('open');
     });
   }
 
-  /* ─── Wallet state ─────────────────────────────────── */
+  /* ─── Wallet UI ─────────────────────────────────────── */
   function updateWalletUI() {
     const wallet = localStorage.getItem('walletAddress');
     const connectBtn = document.getElementById('connectWallet');
     const walletInfo = document.getElementById('walletInfoRow');
     const walletAddrEl = document.getElementById('walletAddress');
-    const mobileConnectBtn = document.getElementById('mobileConnectWallet');
 
     if (connectBtn) connectBtn.style.display = wallet ? 'none' : '';
     if (walletInfo) walletInfo.style.display = wallet ? 'flex' : 'none';
     if (walletAddrEl && wallet) {
+      // Show shortened address: 0x1234…abcd
       walletAddrEl.textContent = `${wallet.slice(0, 6)}…${wallet.slice(-4)}`;
-    }
-    if (mobileConnectBtn) {
-      mobileConnectBtn.textContent = wallet
-        ? `🦊 ${wallet.slice(0, 6)}…${wallet.slice(-4)}`
-        : '🦊 Connect Wallet';
     }
   }
 
-  /* ─── Connect Wallet (MetaMask / EIP-1193) ────────── */
+  /* ─── Connect Wallet ────────────────────────────────── */
   async function connectWallet() {
+    const connectBtn = document.getElementById('connectWallet');
+
     if (typeof window.ethereum === 'undefined') {
+      // Mobile without MetaMask → open MetaMask deep link
+      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        const deepLink = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}${window.location.search}`;
+        window.location.href = deepLink;
+        return;
+      }
       alert('MetaMask is not installed. Please install MetaMask to connect your wallet.');
       window.open('https://metamask.io/download/', '_blank');
       return;
     }
 
-    const btns = [
-      document.getElementById('connectWallet'),
-      document.getElementById('mobileConnectWallet')
-    ];
-
     try {
-      btns.forEach(btn => {
-        if (btn) { btn.disabled = true; btn.textContent = '🦊 Connecting…'; }
-      });
+      if (connectBtn) { connectBtn.disabled = true; connectBtn.textContent = '🦊 Connecting…'; }
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       if (accounts && accounts.length > 0) {
         localStorage.setItem('walletAddress', accounts[0]);
@@ -192,9 +191,10 @@
         alert('Failed to connect wallet: ' + (err.message || 'Unknown error'));
       }
     } finally {
-      btns.forEach(btn => {
-        if (btn) { btn.disabled = false; btn.textContent = '🦊 Connect Wallet'; }
-      });
+      if (connectBtn) {
+        connectBtn.disabled = false;
+        connectBtn.innerHTML = '<span class="wallet-icon">🦊</span> Connect Wallet';
+      }
     }
   }
 
@@ -225,12 +225,7 @@
       requestAnimationFrame(() => {
         const y = window.scrollY;
 
-        // Shrink
-        if (y > 60) {
-          navbar.classList.add('navbar-scrolled');
-        } else {
-          navbar.classList.remove('navbar-scrolled');
-        }
+        navbar.classList.toggle('navbar-scrolled', y > 60);
 
         // Hide on scroll-down / reveal on scroll-up
         if (y > lastScroll && y > 200) {
@@ -247,68 +242,28 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  /* ─── Mobile overlay ───────────────────────────────── */
-  function initMobileOverlay() {
-    const toggle = document.getElementById('mobileToggle');
-    const overlay = document.getElementById('mobileOverlay');
-    if (!toggle || !overlay) return;
-
-    function openMenu() {
-      toggle.classList.add('active');
-      overlay.classList.add('open');
-      document.body.classList.add('menu-open');
-    }
-
-    function closeMenu() {
-      toggle.classList.remove('active');
-      overlay.classList.remove('open');
-      document.body.classList.remove('menu-open');
-    }
-
-    toggle.addEventListener('click', () => {
-      if (overlay.classList.contains('open')) closeMenu();
-      else openMenu();
-    });
-
-    // Close on link click
-    overlay.querySelectorAll('.mobile-nav-link, .mobile-btn, .mobile-wallet-btn').forEach(el => {
-      el.addEventListener('click', closeMenu);
-    });
-
-    // Close on Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMenu();
-    });
-  }
-
   /* ─── Active page detection ────────────────────────── */
   function setActiveLinks() {
     const path = window.location.pathname.split('/').pop() || 'index.html';
     const page = path.replace('.html', '') || 'index';
 
-    // Desktop links
     document.querySelectorAll('.navbar-links a[data-page]').forEach(link => {
-      link.classList.toggle('active', link.dataset.page === page);
-    });
-
-    // Mobile links
-    document.querySelectorAll('.mobile-nav-link[data-page]').forEach(link => {
       link.classList.toggle('active', link.dataset.page === page);
     });
   }
 
-  /* ─── Account change listener (MetaMask) ───────────── */
+  /* ─── MetaMask account/chain listeners ─────────────── */
   function initAccountChangeListener() {
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          localStorage.setItem('walletAddress', accounts[0]);
-          updateWalletUI();
-        }
-      });
-    }
+    if (!window.ethereum) return;
+
+    window.ethereum.on('accountsChanged', (accounts) => {
+      if (accounts.length === 0) {
+        disconnectWallet();
+      } else {
+        localStorage.setItem('walletAddress', accounts[0]);
+        updateWalletUI();
+      }
+    });
   }
 
   /* ─── Boot ─────────────────────────────────────────── */
@@ -317,22 +272,17 @@
     updateWalletUI();
     initStickyNav();
     initAvatarDropdown();
-    initMobileOverlay();
     setActiveLinks();
     initAccountChangeListener();
 
     // Wire up buttons
     const connectBtn = document.getElementById('connectWallet');
-    const mobileConnectBtn = document.getElementById('mobileConnectWallet');
     const disconnectBtn = document.getElementById('disconnectWallet');
     const logoutBtn = document.getElementById('logoutBtn');
-    const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
 
     if (connectBtn) connectBtn.addEventListener('click', connectWallet);
-    if (mobileConnectBtn) mobileConnectBtn.addEventListener('click', connectWallet);
     if (disconnectBtn) disconnectBtn.addEventListener('click', disconnectWallet);
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
-    if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', handleLogout);
   }
 
   document.addEventListener('DOMContentLoaded', init);

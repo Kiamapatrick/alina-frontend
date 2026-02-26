@@ -27,6 +27,7 @@
         year: new Date().getFullYear(),
         month: new Date().getMonth(),  // 0-indexed
         bookedSet: new Set(),
+        rawBookings: [],   // cached so month-nav can re-build
         checkIn: null,   // 'YYYY-MM-DD'
         checkOut: null,   // 'YYYY-MM-DD' (exclusive — day after last night)
         awaitingCheckout: false,
@@ -105,7 +106,7 @@
     // ─────────────────────────────────────────────────────────────
     // BUILD ONE MONTH PANEL
     // ─────────────────────────────────────────────────────────────
-    function buildPanel(year, month, panelIdx) {
+    function buildPanel(year, month, panelIdx, isMobile) {
         const firstDay = new Date(year, month, 1);
         const lastDate = new Date(year, month + 1, 0).getDate();
         const label = firstDay.toLocaleString('default', { month: 'long', year: 'numeric' });
@@ -140,8 +141,6 @@
         nextBtn.type = 'button';
         nextBtn.setAttribute('aria-label', 'Next month');
         nextBtn.textContent = '›';
-        // Only second panel (or first on mobile) shows next arrow
-        const isMobile = window.innerWidth < 768;
         nextBtn.style.visibility = (panelIdx === 1 || isMobile) ? 'visible' : 'hidden';
         nextBtn.addEventListener('click', () => stepMonth(1));
 
@@ -279,17 +278,21 @@
         $wrap = document.createElement('div');
         $wrap.className = 'enh-cal-wrap';
 
-        const panel0 = buildPanel(S.year, S.month, 0);
+        const isMobile = window.innerWidth < 768;
+
+        const panel0 = buildPanel(S.year, S.month, 0, isMobile);
         $wrap.appendChild(panel0);
 
-        // Second month (desktop only — hidden on mobile via CSS)
-        let ny = S.year, nm = S.month + 1;
-        if (nm > 11) { nm = 0; ny++; }
-        const sep = document.createElement('div');
-        sep.className = 'enh-cal-sep';
-        const panel1 = buildPanel(ny, nm, 1);
-        $wrap.appendChild(sep);
-        $wrap.appendChild(panel1);
+        // Second month — only rendered on desktop (≥768px)
+        if (!isMobile) {
+            let ny = S.year, nm = S.month + 1;
+            if (nm > 11) { nm = 0; ny++; }
+            const sep = document.createElement('div');
+            sep.className = 'enh-cal-sep';
+            const panel1 = buildPanel(ny, nm, 1, false);
+            $wrap.appendChild(sep);
+            $wrap.appendChild(panel1);
+        }
 
         // Insert after hint
         $calSection.insertBefore($wrap, $hint.nextSibling);
@@ -374,6 +377,15 @@
         if (S.month > 11) { S.month = 0; S.year++; }
         if (S.month < 0) { S.month = 11; S.year--; }
 
+        // Re-build booked set from cached bookings so marks survive navigation
+        if (S.rawBookings.length > 0) {
+            S.bookedSet = buildBookedSet(S.rawBookings);
+        } else if (window._calendarBookings?.length > 0) {
+            // Fallback: pick up bookings cached by booking.js's loadCalendar
+            S.rawBookings = window._calendarBookings;
+            S.bookedSet = buildBookedSet(S.rawBookings);
+        }
+
         // Keep booking.js month state in sync
         if (typeof window._enhSyncMonth === 'function') {
             window._enhSyncMonth(S.year, S.month);
@@ -397,12 +409,14 @@
         }
 
         if (!S.checkIn) {
-            // First click → check-in
+            // First click → check-in + auto checkout next day (1 night default)
             S.checkIn = dateStr;
-            S.awaitingCheckout = true;
+            S.checkOut = addDays(dateStr, 1); // auto-select next day as checkout
+            S.awaitingCheckout = true;         // still allow extending with a 2nd click
             S.hoverDate = null;
             syncInputs();
             render();
+            updateCta();
             // Pop animation
             const fresh = $wrap?.querySelector(`[data-date="${dateStr}"]`);
             if (fresh) { fresh.classList.add('just-popped'); }
@@ -574,14 +588,12 @@
     // PATCH: intercept booking.js's renderCalendar
     // ─────────────────────────────────────────────────────────────
     function patchRenderCalendar() {
-        // booking.js calls renderCalendar(bookings) directly (not on window).
-        // We shim window.renderCalendar so any external call goes through us.
-        // booking.js also calls loadCalendar → fetch → renderCalendar internally.
-        // We patch the booking.js module by overriding after DOMContentLoaded.
-
-        // Primary shim on window
+        // booking.js calls its own local renderCalendar(bookings).
+        // booking.js's loadCalendar() also calls window.renderCalendar(bookings)
+        // right after — so this shim receives the real bookings array.
         window.renderCalendar = function (bookings) {
-            S.bookedSet = buildBookedSet(bookings);
+            S.rawBookings = bookings || [];
+            S.bookedSet = buildBookedSet(S.rawBookings);
             render();
         };
     }
@@ -608,7 +620,13 @@
         buildCta();
         watchPrice();
 
-        // Initial render with empty booked set (booking.js will call renderCalendar later)
+        // If booking.js already ran and cached bookings, use them now
+        if (window._calendarBookings?.length > 0) {
+            S.rawBookings = window._calendarBookings;
+            S.bookedSet = buildBookedSet(S.rawBookings);
+        }
+
+        // Initial render (booking.js will call window.renderCalendar with real data shortly)
         render();
 
         // Re-render on resize (dual↔single switch)

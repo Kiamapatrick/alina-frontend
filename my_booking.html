@@ -1212,60 +1212,48 @@
     <!-- ═══ Navbar ═══ -->
     <nav id="mainNavbar" class="alina-navbar">
         <div class="navbar-inner">
-            <a class="navbar-logo" href="index.html">Alina<span>906</span>Vibes</a>
-            <ul class="navbar-links">
-                <li><a href="index.html" data-page="index">Home</a></li>
-                <li><a href="about.html" data-page="about">About</a></li>
-                <li><a href="contact.html" data-page="contact">Contact</a></li>
-            </ul>
-            <div class="navbar-actions">
-                <a id="loginLink" href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
-                <a id="signupLink" href="signup.html" class="nav-btn nav-btn-solid">Sign Up</a>
-                <div class="wallet-area" id="navWalletWrapper">
-                    <button id="connectWallet" class="wallet-connect-btn"><span class="wallet-icon">🦊</span> Connect
-                        Wallet</button>
-                    <div id="walletInfoRow" class="wallet-connected" style="display:none;">
-                        <span class="wallet-status-dot"></span>
-                        <span id="walletAddress" class="wallet-addr">—</span>
-                        <button id="disconnectWallet" class="wallet-disconnect-btn">✕</button>
+            <div class="navbar-row1">
+                <a class="navbar-logo" href="index.html">Alina<span>906</span>Vibes</a>
+                <ul class="navbar-links">
+                    <li><a href="index.html" data-page="index">Home</a></li>
+                    <li><a href="about.html" data-page="about">About</a></li>
+                    <li><a href="contact.html" data-page="contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="navbar-row2">
+                <div class="navbar-actions">
+                    <span class="nav-welcome" id="navWelcome"></span>
+                    <a id="loginLink" href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
+                    <a id="signupLink" href="signup.html" class="nav-btn nav-btn-solid">Sign Up</a>
+                    <div class="wallet-area" id="navWalletWrapper">
+                        <button id="connectWallet" class="wallet-connect-btn"><span class="wallet-icon">🦊</span>
+                            Connect Wallet</button>
+                        <div id="walletInfoRow" class="wallet-connected" style="display:none;">
+                            <span class="wallet-status-dot"></span>
+                            <span id="walletAddress" class="wallet-addr">—</span>
+                            <button id="disconnectWallet" class="wallet-disconnect-btn">✕</button>
+                        </div>
                     </div>
-                </div>
-                <div id="avatarDropdown" class="avatar-area" style="display:none;">
-                    <button class="avatar-btn" id="avatarToggle"><span class="avatar-initials"
-                            id="avatarInitials">?</span></button>
-                    <div class="avatar-menu" id="avatarMenu">
-                        <a href="my-bookings.html" class="avatar-menu-item active">📋 My Bookings</a>
-                        <a href="#" class="avatar-menu-item">👤 Account</a>
-                        <div class="avatar-menu-item kyc-status-item">🛡️ KYC Status <span id="kycBadge"
-                                class="kyc-badge">—</span></div>
-                        <hr class="avatar-menu-divider">
-                        <button id="logoutBtn" class="avatar-menu-item logout-item">🚪 Log Out</button>
+                    <div id="avatarDropdown" class="avatar-area" style="display:none;">
+                        <button class="avatar-btn" id="avatarToggle">
+                            <span class="avatar-initials" id="avatarInitials">?</span>
+                            <span class="avatar-name" id="avatarName">User</span>
+                        </button>
+                        <div class="avatar-menu" id="avatarMenu">
+                            <a href="my-bookings.html" class="avatar-menu-item active">📋 My Bookings</a>
+                            <a href="#" class="avatar-menu-item">👤 Account</a>
+                            <div class="avatar-menu-item kyc-status-item">🛡️ KYC Status <span id="kycBadge"
+                                    class="kyc-badge">—</span></div>
+                            <hr class="avatar-menu-divider">
+                            <button id="logoutBtn" class="avatar-menu-item logout-item">🚪 Log Out</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
-                <span class="hamburger-bar"></span><span class="hamburger-bar"></span><span
-                    class="hamburger-bar"></span>
-            </button>
         </div>
     </nav>
-    <div class="mobile-overlay" id="mobileOverlay">
-        <div class="mobile-overlay-content">
-            <a href="index.html" class="mobile-nav-link" data-page="index">Home</a>
-            <a href="about.html" class="mobile-nav-link" data-page="about">About</a>
-            <a href="contact.html" class="mobile-nav-link" data-page="contact">Contact</a>
-            <hr class="mobile-divider">
-            <div class="mobile-auth">
-                <a href="login.html" class="nav-btn nav-btn-outline mobile-btn" id="mobileLoginLink">Sign In</a>
-                <a href="signup.html" class="nav-btn nav-btn-solid mobile-btn" id="mobileSignupLink">Sign Up</a>
-            </div>
-            <div class="mobile-wallet">
-                <button id="mobileConnectWallet" class="wallet-connect-btn mobile-wallet-btn">🦊 Connect Wallet</button>
-            </div>
-            <button id="mobileLogoutBtn" class="nav-btn nav-btn-outline mobile-btn" style="display:none;">Log
-                Out</button>
-        </div>
-    </div>
+
+
 
     <!-- ═══════════════════
        HERO
