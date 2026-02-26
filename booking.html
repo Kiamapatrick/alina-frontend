@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="css/booking2.css" />
   <link rel="stylesheet" href="css/new.css" />
   <link rel="stylesheet" href="css/navbar.css" />
+  <!-- ✅ Enhanced calendar + floating CTA + mobile form reorder -->
+  <link rel="stylesheet" href="css/booking-enhanced.css" />
 </head>
 
 <body class="booking-page">
@@ -42,7 +44,7 @@
           <button class="avatar-btn" id="avatarToggle"><span class="avatar-initials"
               id="avatarInitials">?</span></button>
           <div class="avatar-menu" id="avatarMenu">
-            <a href="booking.html" class="avatar-menu-item">📋 My Bookings</a>
+            <a href="my_booking.html" class="avatar-menu-item">📋 My Bookings</a>
             <a href="#" class="avatar-menu-item">👤 Account</a>
             <div class="avatar-menu-item kyc-status-item">🛡️ KYC Status <span id="kycBadge" class="kyc-badge">—</span>
             </div>
@@ -150,10 +152,17 @@
           </div>
         </section>
 
-        <!-- 6. CALENDAR -->
+        <!-- 6. CALENDAR
+             ─────────────────────────────────────────────────────
+             calendar-enhanced.js injects dual-month UI here.
+             The original #calendar-header and #calendar are kept
+             so booking.js doesn't throw null-reference errors;
+             they are hidden via .enh-hidden by the enhancer.
+             ───────────────────────────────────────────────────── -->
         <section class="booking-section reveal">
           <h2 class="section-title">Availability</h2>
           <div class="calendar-section" id="calendarContainer">
+            <!-- Legacy booking.js elements — hidden by calendar-enhanced.js -->
             <div id="calendar-header">
               <button id="prevMonth">‹</button>
               <h5 id="monthYear"></h5>
@@ -169,6 +178,8 @@
               <div class="calendar-weekday">Sun</div>
             </div>
             <div id="calendar" class="calendar-grid mt-2"></div>
+            <!-- ↑ booking.js still renders cells here (hidden); our enhancer
+                 reads the booked set and re-renders in .enh-cal-wrap above. -->
           </div>
         </section>
 
@@ -217,54 +228,15 @@
           </div>
         </section>
 
-        <!-- 8. FAQ -->
-        <section class="booking-section reveal">
-          <h2 class="section-title">Frequently Asked Questions</h2>
-          <div class="faq-list">
-            <div class="faq-item">
-              <button class="faq-question">How do I book a stay? <span class="faq-chevron">▼</span></button>
-              <div class="faq-answer">
-                <p>Select your check-in and check-out dates on the calendar, enter your phone number, choose a payment
-                  method, and click Reserve. You can pay a deposit or the full amount.</p>
-              </div>
-            </div>
-            <div class="faq-item">
-              <button class="faq-question">What payment methods are accepted? <span
-                  class="faq-chevron">▼</span></button>
-              <div class="faq-answer">
-                <p>We accept M-Pesa, Visa/Mastercard (via Paystack), and cryptocurrency payments on the Polygon Amoy
-                  network via MetaMask.</p>
-              </div>
-            </div>
-            <div class="faq-item">
-              <button class="faq-question">Can I cancel my booking? <span class="faq-chevron">▼</span></button>
-              <div class="faq-answer">
-                <p>Yes, bookings can be cancelled before check-in. For crypto payments, refunds are processed on-chain.
-                  For other methods, contact support.</p>
-              </div>
-            </div>
-            <div class="faq-item">
-              <button class="faq-question">How do I access the property? <span class="faq-chevron">▼</span></button>
-              <div class="faq-answer">
-                <p>An access code will be sent to your phone number on the day of check-in. Make sure to provide a valid
-                  phone number during booking.</p>
-              </div>
-            </div>
-            <div class="faq-item">
-              <button class="faq-question">Is KYC verification required? <span class="faq-chevron">▼</span></button>
-              <div class="faq-answer">
-                <p>KYC verification is recommended for a smoother booking experience and may be required for certain
-                  properties or longer stays.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
       </div><!-- /booking-main -->
 
-      <!-- ════════ RIGHT SIDEBAR ════════ -->
+      <!-- ════════ RIGHT SIDEBAR ════════
+           Desktop: sticky right column (unchanged).
+           Mobile:  CSS order:2 moves this BELOW calendar.
+           No markup duplication — pure CSS reorder.
+           ════════════════════════════════ -->
       <aside class="booking-sidebar">
-        <div class="booking-card">
+        <div class="booking-card" id="bookingCard">
 
           <!-- Price header -->
           <div class="booking-card-header">
@@ -277,7 +249,7 @@
             </div>
           </div>
 
-          <!-- Booking form (same IDs as before) -->
+          <!-- Booking form (all IDs unchanged — booking.js reads them) -->
           <form id="bookingForm" novalidate>
             <div class="date-grid">
               <div class="date-cell">
@@ -370,7 +342,6 @@
           </form>
         </div>
 
-
       </aside>
 
     </div><!-- /booking-grid -->
@@ -387,7 +358,7 @@
     </div>
   </div>
 
-  <!-- Mobile Sticky Bottom Bar -->
+  <!-- Mobile Sticky Bottom Bar (replaced by floating CTA on valid selection) -->
   <div class="mobile-booking-bar" id="mobileBookingBar">
     <div class="mobile-bar-price">
       <span class="price-amount" id="mobilePrice">$35</span>
@@ -405,7 +376,7 @@
   <footer class="booking-footer">© 2025 Alina906Vibes — Built on Polygon Amoy Testnet</footer>
 
   <!-- ═══════════════════════════════════════ -->
-  <!-- SCRIPTS -->
+  <!-- SCRIPTS                                -->
   <!-- ═══════════════════════════════════════ -->
   <script type="module">
     const urlParams = new URLSearchParams(window.location.search);
@@ -586,6 +557,10 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     crossorigin="anonymous"></script>
   <script src="js/nav.js"></script>
+
+  <!-- ✅ Calendar enhancer — must load BEFORE booking.js so it can shim renderCalendar -->
+  <script src="js/calendar-enhanced.js"></script>
+
   <script type="module" src="js/booking.js"></script>
 
   <script>
@@ -641,7 +616,6 @@
             avgBadge.style.display = "inline-flex";
             avgRating.textContent = data.average;
             reviewCount.textContent = `(${data.count})`;
-            // Populate sidebar + highlights
             const sr = document.getElementById("sidebarRating");
             const hr = document.getElementById("hlRating");
             if (sr) sr.textContent = data.average;

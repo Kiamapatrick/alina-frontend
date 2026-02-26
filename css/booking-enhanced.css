@@ -1,0 +1,559 @@
+/* ═══════════════════════════════════════════════════════════════
+   booking-enhanced.css
+   Load AFTER booking2.css and new.css.
+   Targets existing DOM from booking.html + booking.js output.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Extra tokens (extend booking2.css vars) ─── */
+:root {
+    --cal-range-bg: rgba(25, 135, 84, 0.10);
+    --cal-range-text: #0f5132;
+    --cal-selected-bg: #198754;
+    --cal-selected-text: #ffffff;
+    --cal-blocked-bg: #f7f7f8;
+    --cal-blocked-text: #c4cad4;
+    --cal-past-text: #d1d5db;
+    --cal-hover-bg: rgba(25, 135, 84, 0.07);
+    --cal-today-ring: rgba(25, 135, 84, 0.40);
+}
+
+
+/* ══════════════════════════════════════════════════════
+   1. CALENDAR — OVERRIDE booking.js-generated styles
+   Target: .calendar-day inside #calendar
+   ══════════════════════════════════════════════════════ */
+
+/* Reset base cell */
+#calendar .calendar-day {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.86rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: default;
+    user-select: none;
+    border: none;
+    background: transparent;
+    color: var(--b-dark);
+    transition:
+        background 0.17s ease,
+        color 0.17s ease,
+        transform 0.16s var(--b-ease),
+        box-shadow 0.17s ease;
+}
+
+/* ── Available ── */
+#calendar .calendar-day.available {
+    cursor: pointer;
+    background: var(--b-white);
+    color: var(--b-dark);
+}
+
+#calendar .calendar-day.available:hover {
+    background: var(--b-accent);
+    color: var(--b-primary);
+    transform: scale(1.09);
+    font-weight: 700;
+    box-shadow: 0 2px 10px var(--b-primary-glow);
+    z-index: 2;
+}
+
+/* ── Today highlight ── */
+#calendar .calendar-day.today {
+    box-shadow: inset 0 0 0 1.5px var(--cal-today-ring);
+    font-weight: 700;
+}
+
+/* ── Past ── */
+#calendar .calendar-day.past {
+    color: var(--cal-past-text);
+    cursor: not-allowed;
+    background: transparent;
+}
+
+/* ── Blocked / booked — muted, not aggressive ── */
+#calendar .calendar-day.booked {
+    background: var(--cal-blocked-bg);
+    color: var(--cal-blocked-text);
+    cursor: not-allowed;
+    text-decoration: none;
+    /* remove old strikethrough */
+}
+
+/* Subtle hatching overlay — minimal */
+#calendar .calendar-day.booked::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border-radius: 4px;
+    background: repeating-linear-gradient(-45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.05) 2px,
+            rgba(0, 0, 0, 0.05) 3px);
+    pointer-events: none;
+}
+
+/* ── Selected range fill (between check-in and check-out) ── */
+#calendar .calendar-day.cal-selected {
+    background: var(--cal-selected-bg);
+    color: var(--cal-selected-text);
+    font-weight: 700;
+    transform: scale(1.05);
+    box-shadow: 0 3px 12px var(--b-primary-glow);
+    z-index: 3;
+    border-radius: 8px;
+}
+
+/* Range middle cells */
+#calendar .calendar-day.cal-range {
+    background: var(--cal-range-bg);
+    color: var(--cal-range-text);
+    border-radius: 0;
+    font-weight: 600;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Check-in cap */
+#calendar .calendar-day.cal-start {
+    border-radius: 8px 0 0 8px;
+}
+
+/* Check-out cap */
+#calendar .calendar-day.cal-end {
+    border-radius: 0 8px 8px 0;
+}
+
+/* Only one day selected — fully rounded */
+#calendar .calendar-day.cal-start.cal-end,
+#calendar .calendar-day.cal-selected:not(.cal-range) {
+    border-radius: 8px;
+}
+
+/* ── Hover preview while choosing check-out ── */
+#calendar .calendar-day.cal-hover {
+    background: var(--cal-hover-bg);
+    color: var(--b-primary);
+    border-radius: 0;
+}
+
+/* Pop animation when a date is clicked */
+@keyframes calPop {
+    0% {
+        transform: scale(0.82);
+    }
+
+    60% {
+        transform: scale(1.13);
+    }
+
+    100% {
+        transform: scale(1.05);
+    }
+}
+
+#calendar .calendar-day.just-popped {
+    animation: calPop 0.26s var(--b-ease) forwards;
+}
+
+/* ─── Empty filler cells ─── */
+#calendar .calendar-day.other-month {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   2. DUAL-MONTH WRAPPER (injected by calendar-enhanced.js)
+   ══════════════════════════════════════════════════════ */
+
+.enh-cal-wrap {
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+}
+
+.enh-cal-panel {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.enh-cal-sep {
+    width: 1px;
+    background: var(--b-border);
+    align-self: stretch;
+    margin: 0 20px;
+    flex-shrink: 0;
+}
+
+/* Each panel has its own month header */
+.enh-month-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    min-height: 38px;
+}
+
+.enh-month-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--b-dark);
+    letter-spacing: -0.01em;
+    flex: 1;
+    text-align: center;
+}
+
+.enh-nav-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--b-border);
+    background: var(--b-white);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--b-dark);
+    transition: all var(--b-transition);
+    flex-shrink: 0;
+}
+
+.enh-nav-btn:hover {
+    background: var(--b-primary);
+    color: #fff;
+    border-color: var(--b-primary);
+    transform: scale(1.08);
+}
+
+/* Weekday row per panel */
+.enh-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 4px;
+}
+
+.enh-wd {
+    font-size: 0.67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--b-muted);
+    text-align: center;
+    padding: 5px 0;
+}
+
+/* Day grid per panel */
+.enh-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+/* Hide second panel on mobile */
+@media (max-width: 767px) {
+    .enh-cal-wrap {
+        flex-direction: column;
+    }
+
+    .enh-cal-sep {
+        display: none;
+    }
+
+    .enh-cal-panel.enh-panel-next {
+        display: none;
+    }
+}
+
+/* ── Hide the original booking.js header on desktop (replaced by enh-cal-wrap) ── */
+/* We hide calendar-header on desktop, show it on mobile as fallback only */
+@media (min-width: 768px) {
+
+    /* On desktop the enh-cal-wrap is shown, legacy header hidden */
+    #calendar-header.enh-hidden {
+        display: none !important;
+    }
+
+    #monthYear.enh-hidden {
+        display: none !important;
+    }
+}
+
+/* ── Selection hint strip ── */
+.enh-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    background: var(--b-accent);
+    border: 1px solid rgba(25, 135, 84, 0.15);
+    border-radius: var(--b-radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--b-primary);
+    margin-bottom: 14px;
+    transition: opacity 0.25s ease, max-height 0.25s ease;
+    overflow: hidden;
+}
+
+.enh-hint.enh-hint-hidden {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    pointer-events: none;
+}
+
+.enh-hint-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--b-primary);
+    flex-shrink: 0;
+    animation: hintPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.35;
+        transform: scale(0.65);
+    }
+}
+
+/* ── Summary chips below calendar ── */
+.enh-summary {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.enh-chip {
+    flex: 1;
+    min-width: 80px;
+    padding: 9px 12px;
+    background: var(--b-white);
+    border: 1.5px solid var(--b-border);
+    border-radius: var(--b-radius-sm);
+    transition: border-color var(--b-transition), background var(--b-transition);
+}
+
+.enh-chip.active {
+    border-color: var(--b-primary);
+    background: var(--b-accent);
+}
+
+.enh-chip-lbl {
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--b-muted);
+    margin-bottom: 3px;
+}
+
+.enh-chip-val {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--b-dark);
+}
+
+.enh-chip.active .enh-chip-val {
+    color: var(--b-primary);
+}
+
+.enh-chip-empty {
+    font-weight: 400;
+    color: var(--b-muted);
+    font-size: 0.82rem;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   3. FLOATING CHECKOUT CTA
+   ══════════════════════════════════════════════════════ */
+
+.enh-floating-cta {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    z-index: 900;
+    background: #0d1f13;
+    border-radius: 100px;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.22),
+        0 2px 8px rgba(0, 0, 0, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 0.32s var(--b-ease),
+        transform 0.32s var(--b-ease);
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.enh-floating-cta.enh-cta-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+.enh-cta-info {
+    padding: 13px 18px 13px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.enh-cta-nights {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+}
+
+.enh-cta-price {
+    font-size: 0.97rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+}
+
+.enh-cta-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.10);
+    flex-shrink: 0;
+}
+
+.enh-cta-btn {
+    padding: 0 22px;
+    min-height: 50px;
+    background: linear-gradient(135deg, #198754, #157347);
+    border: none;
+    color: #fff;
+    font-family: var(--b-font);
+    font-size: 0.86rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.2s ease;
+}
+
+.enh-cta-btn:hover {
+    background: linear-gradient(135deg, #22a06b, #198754);
+}
+
+.enh-cta-btn svg {
+    opacity: 0.8;
+    transition: transform 0.18s ease;
+}
+
+.enh-cta-btn:hover svg {
+    transform: translateX(3px);
+}
+
+/* ── Mobile: full-width sticky bottom bar ── */
+@media (max-width: 767px) {
+    .enh-floating-cta {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: translateY(100%);
+        border-radius: 0;
+        width: 100%;
+        justify-content: space-between;
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.18);
+        border-radius: 0;
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .enh-floating-cta.enh-cta-visible {
+        transform: translateY(0);
+    }
+
+    .enh-cta-info {
+        padding: 13px 16px;
+    }
+
+    .enh-cta-btn {
+        border-radius: 0;
+        padding: 0 22px;
+        font-size: 0.9rem;
+    }
+
+    /* Prevent content hidden behind mobile CTA */
+    body.enh-cta-open {
+        padding-bottom: 58px;
+    }
+}
+
+/* Desktop: add bottom room only when visible */
+@media (min-width: 768px) {
+    body.enh-cta-open {
+        /* no change needed — CTA floats above content */
+    }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   4. MOBILE FORM REORDER
+   booking-sidebar goes BELOW calendar on mobile.
+   booking2.css sets order:-1 on sidebar at ≤991px.
+   We override that so sidebar appears after main.
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 991px) {
+    .booking-sidebar {
+        order: 2 !important;
+        /* after .booking-main */
+        margin-bottom: 80px;
+        /* room for mobile CTA bar */
+        margin-top: 24px;
+    }
+
+    .booking-main {
+        order: 1;
+    }
+
+    /* Hide the old always-visible mobile sticky bar
+     now that the floating CTA replaces it */
+    .mobile-booking-bar {
+        display: none !important;
+    }
+}
+
+/* Desktop: keep existing layout untouched */
+@media (min-width: 992px) {
+    .booking-sidebar {
+        order: unset !important;
+    }
+
+    .booking-main {
+        order: unset !important;
+    }
+}
