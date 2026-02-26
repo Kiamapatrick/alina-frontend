@@ -1,585 +1,717 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Booking — Alina906Vibes</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    crossorigin="anonymous" />
   <link rel="stylesheet" href="css/booking2.css" />
   <link rel="stylesheet" href="css/new.css" />
-  
-
+  <link rel="stylesheet" href="css/navbar.css" />
 </head>
-<body>
 
+<body class="booking-page">
 
+  <!-- Status Toast -->
+  <div id="bookingStatus"></div>
 
-<!-- Status Message (Fixed Position) -->
-<div id="bookingStatus"></div>
-
-<header class="py-3 border-bottom">
-  <div class="container d-flex flex-wrap align-items-center justify-content-between">
-    <div class="brand fw-bold fs-4">Alina906Vibes</div>
-
-    <nav class="d-flex flex-wrap align-items-center gap-2">
-      <a href="index.html" class="nav-link text-dark">Home</a>
-      <a href="about.html" class="nav-link text-dark">About</a>
-      <a href="contact.html" class="nav-link text-dark">Contact</a>
-      <a id="loginLink" href="login.html" class="btn btn-outline-success ms-3">Sign In</a>
-      <a id="signupLink" href="signup.html" class="btn btn-success ms-2">Sign Up</a>
-    </nav>
-
-<div class="wallet-controls-wrapper">
-  <!-- Connect button (hidden after connect) -->
-  <button id="connectWallet" class="btn-wallet-connect">
-    <span class="wallet-icon">🦊</span>
-    <span class="wallet-btn-text">Connect Wallet</span>
-  </button>
-
-  <!-- Shown after connect, hidden by default -->
-  <div id="walletInfoRow" class="wallet-info-row" style="display:none;">
-    <div class="wallet-badge">
-      <span class="wallet-dot"></span>
-      <span id="walletAddress" class="wallet-addr">—</span>
-    </div>
-    <button id="disconnectWallet" class="btn-wallet-disconnect">
-      Disconnect
-    </button>
-  </div>
-
-  <button id="logoutBtn" class="btn btn-logout">Logout</button>
-</div>
-  </div>
-</header>
-
-<main class="booking-container">
-  <section class="rental-header mb-3">
-    <h1 id="rentalTitle">Loading...</h1>
-    <p id="rentalDescription" class="text-muted"></p>
-  </section>
-
-  <section class="row g-4 align-items-start">
-    <div class="col-lg-7">
-      <!-- Image Gallery -->
-      <div class="gallery-section mb-3">
-        <div id="rentalGallery" class="gallery-grid border rounded overflow-hidden">
-          <!-- Images will be injected here dynamically -->
-        </div>
-      </div>
-      <section class="unit-details mb-4">
-  <h4 class="mb-2">About this unit</h4>
-  <p id="unitLongDescription" class="text-muted">
-    Comfortable, fully furnished unit ideal for short and long stays.
-  </p>
-
-  <div class="row mt-3">
-    <div class="col-md-6">
-      <h6>Amenities</h6>
-      <ul id="unitAmenities" class="list-unstyled small">
-        <li>✔ Free Wi-Fi</li>
-        <li>✔ Smart TV</li>
-        <li>✔ Fully equipped kitchen</li>
-        <li>✔ Hot shower</li>
+  <!-- ═══ Premium Navbar ═══ -->
+  <nav id="mainNavbar" class="alina-navbar">
+    <div class="navbar-inner">
+      <a class="navbar-logo" href="index.html">Alina<span>906</span>Vibes</a>
+      <ul class="navbar-links">
+        <li><a href="index.html" data-page="index">Home</a></li>
+        <li><a href="about.html" data-page="about">About</a></li>
+        <li><a href="contact.html" data-page="contact">Contact</a></li>
       </ul>
-    </div>
-
-    <div class="col-md-6">
-      <h6>Location</h6>
-      <p id="unitLocation" class="small text-muted">
-        Kilimani, Nairobi, 5 minutes from Yaya Centre.
-      </p>
-    </div>
-  </div>
-</section>
-
-
-      <div class="booking-display mb-3">
-        <h5>Availability</h5>
-
-        <div id="calendarContainer" class="border rounded p-3 bg-light">
-          <div id="calendar-header" class="d-flex justify-content-between align-items-center mb-2">
-            <button id="prevMonth" class="btn btn-outline-secondary btn-sm">‹</button>
-            <h5 id="monthYear" class="m-0 fw-bold"></h5>
-            <button id="nextMonth" class="btn btn-outline-secondary btn-sm">›</button>
+      <div class="navbar-actions">
+        <a id="loginLink" href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
+        <a id="signupLink" href="signup.html" class="nav-btn nav-btn-solid">Sign Up</a>
+        <div class="wallet-area" id="navWalletWrapper">
+          <button id="connectWallet" class="wallet-connect-btn"><span class="wallet-icon">🦊</span> Connect
+            Wallet</button>
+          <div id="walletInfoRow" class="wallet-connected" style="display:none;">
+            <span class="wallet-status-dot"></span>
+            <span id="walletAddress" class="wallet-addr">—</span>
+            <button id="disconnectWallet" class="wallet-disconnect-btn">✕</button>
           </div>
-
-          <div class="calendar-grid text-center">
-            <div class="calendar-weekday fw-bold">Mon</div>
-            <div class="calendar-weekday fw-bold">Tue</div>
-            <div class="calendar-weekday fw-bold">Wed</div>
-            <div class="calendar-weekday fw-bold">Thu</div>
-            <div class="calendar-weekday fw-bold">Fri</div>
-            <div class="calendar-weekday fw-bold">Sat</div>
-            <div class="calendar-weekday fw-bold">Sun</div>
+        </div>
+        <div id="avatarDropdown" class="avatar-area" style="display:none;">
+          <button class="avatar-btn" id="avatarToggle"><span class="avatar-initials"
+              id="avatarInitials">?</span></button>
+          <div class="avatar-menu" id="avatarMenu">
+            <a href="booking.html" class="avatar-menu-item">📋 My Bookings</a>
+            <a href="#" class="avatar-menu-item">👤 Account</a>
+            <div class="avatar-menu-item kyc-status-item">🛡️ KYC Status <span id="kycBadge" class="kyc-badge">—</span>
+            </div>
+            <hr class="avatar-menu-divider">
+            <button id="logoutBtn" class="avatar-menu-item logout-item">🚪 Log Out</button>
           </div>
-
-          <div id="calendar" class="calendar-grid mt-2"></div>
         </div>
       </div>
-      <section class="unit-reviews mb-4">
-  <div class="d-flex justify-content-between align-items-center mb-2">
-    <h4 class="mb-0">Guest Reviews</h4>
-    <span class="badge bg-success">4.8 ★</span>
-  </div>
-
-  <div id="reviewsList" class="vstack gap-3">
-    <div class="border rounded p-3">
-      <div class="d-flex justify-content-between">
-        <strong>James K.</strong>
-        <span class="text-warning small">★★★★★</span>
-      </div>
-      <p class="mb-0 small text-muted">
-        Clean, secure, and exactly as advertised. Smooth check-in.
-      </p>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+        <span class="hamburger-bar"></span><span class="hamburger-bar"></span><span class="hamburger-bar"></span>
+      </button>
     </div>
-
-    <div class="border rounded p-3">
-      <div class="d-flex justify-content-between">
-        <strong>Linda M.</strong>
-        <span class="text-warning small">★★★★☆</span>
-      </div>
-      <p class="mb-0 small text-muted">
-        Great location and responsive host. Would book again.
-      </p>
-    </div>
-  </div>
-</section>
-
-    </div>
-
-<aside class="col-lg-5">
-  <div class="card shadow-sm mb-3">
-    <div class="card-body">
-      <h5 class="card-title">Booking</h5>
-
-      <!-- Price info -->
-      <p class="mb-2">
-        Price per night:
-        <strong id="unitPrice">KES 3,500</strong>
-      </p>
-
-      <!-- Booking form -->
-      <form id="bookingForm" novalidate>
-        <!-- Dates -->
-        <div class="mb-2">
-          <label for="startDate" class="form-label small">Check-in</label>
-          <input id="startDate" class="form-control" type="date" required />
-        </div>
-
-        <div class="mb-3">
-          <label for="endDate" class="form-label small">Check-out</label>
-          <input id="endDate" class="form-control" type="date" required />
-        </div>
-
-        <!-- Booking summary -->
-        <div class="border rounded p-2 mb-3">
-          <div class="d-flex justify-content-between small">
-            <span>Nights</span>
-            <strong id="totalNights">0</strong>
-          </div>
-
-          <div class="d-flex justify-content-between small">
-            <span>Full Amount</span>
-            <strong id="fullAmount">KES 0</strong>
-          </div>
-
-          <div class="d-flex justify-content-between small">
-            <span>Deposit</span>
-            <strong id="depositAmount">KES 500</strong>
-          </div>
-
-          <div class="d-flex justify-content-between small">
-            <span>Balance</span>
-            <strong id="balanceAmount">KES 0</strong>
-          </div>
-        </div>
-
-        <!-- Payment options -->
-        <div class="mb-3">
-          <label class="form-label small">Payment Option</label>
-
-          <div class="form-check border rounded p-2 mb-2">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="paymentType"
-              id="payFull"
-              value="FULL"
-            />
-            <label class="form-check-label" for="payFull">
-              Pay Full Amount
-              <div class="small text-muted">
-                Pay <span id="fullAmountLabel">KES 0</span> now
-              </div>
-            </label>
-          </div>
-
-          <div class="form-check border rounded p-2">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="paymentType"
-              id="payDeposit"
-              value="DEPOSIT"
-              checked
-            />
-            <label class="form-check-label" for="payDeposit">
-              Pay Deposit
-              <div class="small text-muted">
-                Pay KES 500 now, balance before check-in
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Guest phone -->
-        <div class="mb-3">
-          <label for="guestPhone" class="form-label small">
-            Guest Phone Number (for access code)
-          </label>
-          <input
-            type="tel"
-            id="guestPhone"
-            class="form-control"
-            placeholder="254712345678"
-            required
-          />
-          <div class="form-text">
-            Access code will be sent on check-in day.
-          </div>
-        </div>
-        <div class="mb-3" id="emailFieldWrapper">
-  <label for="guestEmail" class="form-label small">
-    Email Address
-  </label>
-  <input
-    type="email"
-    id="guestEmail"
-    class="form-control"
-    placeholder="your@email.com"
-  />
-  <div class="form-text">
-    Required for card payments.
-  </div>
-</div>
-
-<!-- Payment method -->
-<div class="mb-3">
-  <label for="paymentMethod" class="form-label small">
-    Payment Method
-  </label>
-  <select id="paymentMethod" class="form-select">
-    <option value="mpesa">M-Pesa</option>
-    <option value="visa">Card (Visa/Mastercard via Paystack)</option>
-    <option value="crypto">Crypto (Wallet)</option>
-  </select>
-</div>
-
-        <!-- M-Pesa phone -->
-        <div class="mb-3" id="mpesaFieldWrapper">
-          <label for="mpesaPhone" class="form-label small">
-            M-Pesa Phone Number
-          </label>
-          <input
-            type="tel"
-            id="mpesaPhone"
-            class="form-control"
-            placeholder="254712345678"
-            pattern="254(7|1)[0-9]{8}"
-          />
-          <div class="form-text">
-            You will receive the M-Pesa prompt on this number.
-          </div>
-        </div>
-
-        <!-- Pay button -->
-        <div class="d-grid">
-          <button
-            id="bookBtn"
-            type="button"
-            class="btn btn-success"
-          >
-            Pay KES 0
-          </button>
-        </div>
-<div id="balancePaymentContainer" class="mb-3" style="display: none;">
-  <h6>Pending Balance</h6>
-  <p class="small text-muted">You have a pending balance of <strong id="pendingBalance">KES 0</strong></p>
-  <div class="d-grid">
-    <button id="payBalanceBtn" class="btn btn-warning">Pay Balance</button>
-  </div>
-</div>
-
-      </form>
+  </nav>
+  <div class="mobile-overlay" id="mobileOverlay">
+    <div class="mobile-overlay-content">
+      <a href="index.html" class="mobile-nav-link" data-page="index">Home</a>
+      <a href="about.html" class="mobile-nav-link" data-page="about">About</a>
+      <a href="contact.html" class="mobile-nav-link" data-page="contact">Contact</a>
+      <hr class="mobile-divider">
+      <div class="mobile-auth"><a href="login.html" class="nav-btn nav-btn-outline mobile-btn" id="mobileLoginLink">Sign
+          In</a><a href="signup.html" class="nav-btn nav-btn-solid mobile-btn" id="mobileSignupLink">Sign Up</a></div>
+      <div class="mobile-wallet"><button id="mobileConnectWallet" class="wallet-connect-btn mobile-wallet-btn">🦊
+          Connect Wallet</button></div>
+      <button id="mobileLogoutBtn" class="nav-btn nav-btn-outline mobile-btn" style="display:none;">Log Out</button>
     </div>
   </div>
 
-  <!-- User bookings -->
-<div id="userBookings" class="mb-3">
-  <h6>Your Bookings</h6>
-  <div class="bookings-search mb-2">
-    <input type="text" id="bookingSearch" placeholder="Search bookings..." class="form-control">
-  </div>
-  <div id="bookingsContent" class="bookings-content">
-    <div id="bookingsList" class="bookings-list">
-      <!-- JS will inject booking cards here -->
+  <!-- ═══════════════════════════════════════
+       1. HERO — Gallery + Overlay Info
+       ═══════════════════════════════════════ -->
+  <section class="booking-hero">
+    <div id="rentalGallery" class="gallery-grid">
+      <!-- JS populates images -->
     </div>
-  </div>
-</div>
-
-</aside>
-
+    <div class="hero-overlay"></div>
+    <div class="hero-info">
+      <h1 id="rentalTitle">Loading…</h1>
+      <div class="hero-location"><span>📍</span> <span id="heroLocation">—</span></div>
+    </div>
   </section>
-</main>
 
-<!-- Transaction Cooldown Alert -->
-<div id="txCooldown" style="display: none;">
-  <div class="alert mb-0">
-    ⏱️ Please wait <span id="cooldownTimer">10</span> seconds before next transaction
+  <div class="booking-content">
+    <div class="booking-grid">
+
+      <!-- ════════ LEFT COLUMN ════════ -->
+      <div class="booking-main">
+
+        <!-- 2. QUICK HIGHLIGHTS -->
+        <div class="highlights-row reveal">
+          <div class="highlight-item">
+            <div class="highlight-icon">⭐</div>
+            <div>
+              <div class="highlight-label">Rating</div>
+              <div class="highlight-value" id="hlRating">—</div>
+            </div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-icon">📍</div>
+            <div>
+              <div class="highlight-label">Location</div>
+              <div class="highlight-value" id="hlLocation">—</div>
+            </div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-icon">👥</div>
+            <div>
+              <div class="highlight-label">Guests</div>
+              <div class="highlight-value" id="hlGuests">2 – 4</div>
+            </div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-icon">🛏️</div>
+            <div>
+              <div class="highlight-label">Beds</div>
+              <div class="highlight-value" id="hlBeds">1 – 2</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. ABOUT -->
+        <section class="booking-section reveal">
+          <h2 class="section-title">About this place</h2>
+          <p id="rentalDescription" class="about-text" style="display:none;"></p>
+          <p id="unitLongDescription" class="about-text">Comfortable, fully furnished unit ideal for short and long
+            stays.</p>
+        </section>
+
+        <!-- 4. AMENITIES -->
+        <section class="booking-section reveal">
+          <h2 class="section-title">What this place offers</h2>
+          <ul id="unitAmenities" class="amenities-grid">
+            <li class="amenity-item"><span class="amenity-icon">📶</span> Free Wi-Fi</li>
+            <li class="amenity-item"><span class="amenity-icon">📺</span> Smart TV</li>
+            <li class="amenity-item"><span class="amenity-icon">🍳</span> Fully equipped kitchen</li>
+            <li class="amenity-item"><span class="amenity-icon">🚿</span> Hot shower</li>
+          </ul>
+        </section>
+
+        <!-- 5. LOCATION -->
+        <section class="booking-section reveal">
+          <h2 class="section-title">Location</h2>
+          <div class="map-placeholder">
+            <span class="map-icon">🗺️</span>
+            <p id="unitLocation">Kilimani, Nairobi, 5 minutes from Yaya Centre.</p>
+          </div>
+        </section>
+
+        <!-- 6. CALENDAR -->
+        <section class="booking-section reveal">
+          <h2 class="section-title">Availability</h2>
+          <div class="calendar-section" id="calendarContainer">
+            <div id="calendar-header">
+              <button id="prevMonth">‹</button>
+              <h5 id="monthYear"></h5>
+              <button id="nextMonth">›</button>
+            </div>
+            <div class="calendar-grid text-center">
+              <div class="calendar-weekday">Mon</div>
+              <div class="calendar-weekday">Tue</div>
+              <div class="calendar-weekday">Wed</div>
+              <div class="calendar-weekday">Thu</div>
+              <div class="calendar-weekday">Fri</div>
+              <div class="calendar-weekday">Sat</div>
+              <div class="calendar-weekday">Sun</div>
+            </div>
+            <div id="calendar" class="calendar-grid mt-2"></div>
+          </div>
+        </section>
+
+        <!-- 7. REVIEWS CAROUSEL -->
+        <section class="booking-section reveal" id="reviewsSection">
+          <div class="reviews-header-row">
+            <h2 class="section-title" style="margin:0;">Guest Reviews</h2>
+            <span id="avgBadge" class="avg-badge" style="display:none;">
+              <span id="avgRating">0</span> ★ <span id="reviewCount" class="review-count"></span>
+            </span>
+          </div>
+
+          <!-- Review form -->
+          <div id="reviewFormWrapper" class="review-form-card" style="display:none;">
+            <h6>Leave a Review</h6>
+            <div id="reviewStatus" class="review-status"></div>
+            <form id="reviewForm">
+              <div class="star-selector" id="starSelector">
+                <span class="star-btn" data-value="1">★</span>
+                <span class="star-btn" data-value="2">★</span>
+                <span class="star-btn" data-value="3">★</span>
+                <span class="star-btn" data-value="4">★</span>
+                <span class="star-btn" data-value="5">★</span>
+              </div>
+              <input type="hidden" id="selectedRating" value="0">
+              <textarea id="reviewComment" class="review-textarea" rows="3" placeholder="Share your experience…"
+                maxlength="500"></textarea>
+              <div class="review-form-footer">
+                <span id="charCount" class="char-count">0/500</span>
+                <button type="submit" class="review-submit-btn" id="submitReviewBtn">
+                  <span class="spinner-sm"></span><span class="btn-label">Submit Review</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Reviews list (carousel) -->
+          <div id="reviewsList" class="reviews-carousel">
+            <div class="reviews-empty" id="reviewsEmpty">
+              <span class="empty-icon">💬</span>
+              <p>No reviews yet. Be the first to share your experience!</p>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:16px;">
+            <button class="btn-view-all" id="viewAllReviewsBtn" style="display:none;">View All Reviews</button>
+          </div>
+        </section>
+
+        <!-- 8. FAQ -->
+        <section class="booking-section reveal">
+          <h2 class="section-title">Frequently Asked Questions</h2>
+          <div class="faq-list">
+            <div class="faq-item">
+              <button class="faq-question">How do I book a stay? <span class="faq-chevron">▼</span></button>
+              <div class="faq-answer">
+                <p>Select your check-in and check-out dates on the calendar, enter your phone number, choose a payment
+                  method, and click Reserve. You can pay a deposit or the full amount.</p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-question">What payment methods are accepted? <span
+                  class="faq-chevron">▼</span></button>
+              <div class="faq-answer">
+                <p>We accept M-Pesa, Visa/Mastercard (via Paystack), and cryptocurrency payments on the Polygon Amoy
+                  network via MetaMask.</p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-question">Can I cancel my booking? <span class="faq-chevron">▼</span></button>
+              <div class="faq-answer">
+                <p>Yes, bookings can be cancelled before check-in. For crypto payments, refunds are processed on-chain.
+                  For other methods, contact support.</p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-question">How do I access the property? <span class="faq-chevron">▼</span></button>
+              <div class="faq-answer">
+                <p>An access code will be sent to your phone number on the day of check-in. Make sure to provide a valid
+                  phone number during booking.</p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-question">Is KYC verification required? <span class="faq-chevron">▼</span></button>
+              <div class="faq-answer">
+                <p>KYC verification is recommended for a smoother booking experience and may be required for certain
+                  properties or longer stays.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /booking-main -->
+
+      <!-- ════════ RIGHT SIDEBAR ════════ -->
+      <aside class="booking-sidebar">
+        <div class="booking-card">
+
+          <!-- Price header -->
+          <div class="booking-card-header">
+            <div class="price-display">
+              <span class="price-amount" id="unitPrice">$35</span>
+              <span class="price-unit">/ night</span>
+            </div>
+            <div class="rating-mini">
+              <span class="star">★</span> <span id="sidebarRating">—</span>
+            </div>
+          </div>
+
+          <!-- Booking form (same IDs as before) -->
+          <form id="bookingForm" novalidate>
+            <div class="date-grid">
+              <div class="date-cell">
+                <label for="startDate">Check-in</label>
+                <input id="startDate" type="date" required />
+              </div>
+              <div class="date-cell">
+                <label for="endDate">Check-out</label>
+                <input id="endDate" type="date" required />
+              </div>
+            </div>
+
+            <div class="guest-input-wrap">
+              <label for="guestPhone">Phone Number</label>
+              <input type="tel" id="guestPhone" placeholder="0712345678" required />
+              <div style="font-size:0.72rem;color:var(--b-muted);margin-top:4px;">Access code sent on check-in day.
+              </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="booking-summary-card">
+              <div class="summary-row"><span>Nights</span><strong id="totalNights">0</strong></div>
+              <div class="summary-row"><span>Total Amount</span><strong id="fullAmount">KES 0</strong></div>
+              <div class="summary-divider"></div>
+              <div class="summary-row" style="color:var(--b-primary);"><span>Required Deposit</span><strong
+                  id="depositAmount">KES 500</strong></div>
+              <div class="summary-row" style="font-size:0.8rem;color:var(--b-muted);"><span>Balance (on
+                  arrival)</span><strong id="balanceAmount">KES 0</strong></div>
+            </div>
+
+            <!-- Deposit / Full toggle -->
+            <div class="segmented-control">
+              <input type="radio" name="paymentType" id="payDeposit" value="DEPOSIT" checked hidden />
+              <label class="segmented-control-label" for="payDeposit">Pay Deposit</label>
+              <input type="radio" name="paymentType" id="payFull" value="FULL" hidden />
+              <label class="segmented-control-label" for="payFull">Pay Full</label>
+              <div class="segmented-control-bg"></div>
+            </div>
+            <div style="text-align:center;font-size:0.8rem;color:var(--b-muted);margin-bottom:16px;" id="paymentHint">
+              Pay KES 500 now, rest before check-in.</div>
+
+            <!-- Payment methods -->
+            <div class="pay-method-grid" id="payMethodGrid">
+              <label class="pay-method-card active" data-method="mpesa">
+                <span class="pay-method-icon">📱</span><span class="pay-method-name">M-Pesa</span>
+              </label>
+              <label class="pay-method-card" data-method="visa">
+                <span class="pay-method-icon">💳</span><span class="pay-method-name">Card</span>
+              </label>
+              <label class="pay-method-card" data-method="crypto">
+                <span class="pay-method-icon">🔗</span><span class="pay-method-name">Crypto</span>
+              </label>
+            </div>
+            <select id="paymentMethod" class="form-select" style="display:none;">
+              <option value="mpesa" selected>M-Pesa</option>
+              <option value="visa">Card</option>
+              <option value="crypto">Crypto</option>
+            </select>
+
+            <!-- Conditional fields -->
+            <div id="mpesaFieldWrapper" class="conditional-field">
+              <div class="premium-input">
+                <input type="tel" id="mpesaPhone" class="form-control" placeholder="M-Pesa Number (254…)"
+                  pattern="254(7|1)[0-9]{8}" />
+              </div>
+            </div>
+            <div id="emailFieldWrapper" class="conditional-field" style="display:none;">
+              <div class="premium-input">
+                <input type="email" id="guestEmail" class="form-control" placeholder="Email for receipt" />
+              </div>
+            </div>
+            <div id="cryptoFieldWrapper" class="conditional-field" style="display:none;">
+              <div class="crypto-notice">
+                <span class="crypto-notice-icon">🦊</span>
+                <p>Connect MetaMask to pay on <strong>Polygon Amoy</strong>.</p>
+              </div>
+            </div>
+
+            <!-- Reserve button -->
+            <button id="bookBtn" type="button" class="btn-reserve">
+              Pay <span id="btnPayAmount">KES 0</span>
+            </button>
+
+            <!-- Balance payment -->
+            <div class="balance-section" id="balancePaymentDivider" style="display:none;">
+              <p>Remaining: <strong id="pendingBalance">KES 0</strong></p>
+              <button id="payBalanceBtn" class="btn-balance" type="button">Pay Balance Now</button>
+            </div>
+            <div id="balancePaymentContainer" style="display:none;"></div>
+          </form>
+        </div>
+
+
+      </aside>
+
+    </div><!-- /booking-grid -->
+  </div><!-- /booking-content -->
+
+  <!-- Reviews Modal -->
+  <div class="reviews-modal-overlay" id="reviewsModalOverlay">
+    <div class="reviews-modal">
+      <div class="modal-header">
+        <h3 class="section-title" style="margin:0;">All Reviews</h3>
+        <button class="modal-close" id="closeReviewsModal">✕</button>
+      </div>
+      <div class="modal-reviews-list" id="modalReviewsList"></div>
+    </div>
   </div>
-</div>
 
-<footer class="text-center py-4 border-top">
-  <small>© 2025 Alina906Vibes</small>
-</footer>
+  <!-- Mobile Sticky Bottom Bar -->
+  <div class="mobile-booking-bar" id="mobileBookingBar">
+    <div class="mobile-bar-price">
+      <span class="price-amount" id="mobilePrice">$35</span>
+      <span class="price-detail" id="mobilePriceDetail">/ night</span>
+    </div>
+    <button class="mobile-bar-btn"
+      onclick="document.querySelector('.booking-card').scrollIntoView({behavior:'smooth'})">Reserve</button>
+  </div>
 
-<script type="module">
+  <!-- Transaction Cooldown -->
+  <div id="txCooldown" style="display:none;">
+    <div class="alert mb-0">⏱️ Please wait <span id="cooldownTimer">10</span>s</div>
+  </div>
 
+  <footer class="booking-footer">© 2025 Alina906Vibes — Built on Polygon Amoy Testnet</footer>
 
-/* ===============================
-   URL + UNIT
-================================ */
-const urlParams = new URLSearchParams(window.location.search);
-const unitId = urlParams.get("id");
-const BASE_URL = "https://alina906vibes-backend.onrender.com";
-/* ===============================
-   UI HELPERS
-================================ */
-window.showLoading = function (show = true) {
-  const overlay = document.getElementById("loadingOverlay");
-  if (overlay) overlay.classList.toggle("active", show);
-};
-
-window._statusTimeout = null;
-
-window.showStatus = function (msg, type = "info") {
-  const statusEl = document.getElementById("bookingStatus");
-  if (!statusEl) return;
-
-  if (window._statusTimeout) {
-    clearTimeout(window._statusTimeout);
-    window._statusTimeout = null;
-  }
-
-  // Reset classes
-  statusEl.classList.remove("show", "text-danger", "text-success", "text-muted");
-  statusEl.textContent = msg;
-
-  // Force reflow so removing .show actually resets the transition
-  void statusEl.offsetHeight;
-
-  if (type === "error") statusEl.classList.add("text-danger");
-  else if (type === "success") statusEl.classList.add("text-success");
-  else statusEl.classList.add("text-muted");
-
-  statusEl.classList.add("show");
-
-  window._statusTimeout = setTimeout(() => {
-    statusEl.classList.remove("show");
-    window._statusTimeout = null;
-  }, type === "success" ? 5000 : 7000);
-};
-/* ===============================
-   LOAD RENTAL DETAILS
-================================ */
-async function loadRentalDetails(incomingId) {
-  const id = incomingId || unitId;
-  if (!id) {
-    document.getElementById("rentalTitle").textContent = "Unit not specified";
-    return;
-  }
-
-  try {
-    showLoading(true);
-
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SCRIPTS -->
+  <!-- ═══════════════════════════════════════ -->
+  <script type="module">
+    const urlParams = new URLSearchParams(window.location.search);
+    const unitId = urlParams.get("id");
     const BASE_URL = "https://alina906vibes-backend.onrender.com";
-    const res = await fetch(`${BASE_URL}/units/${id}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    const unit = await res.json();
+    /* ── Status helpers ── */
+    window.showLoading = function (show = true) {
+      const o = document.getElementById("loadingOverlay");
+      if (o) o.classList.toggle("active", show);
+    };
+    window._statusTimeout = null;
+    window.showStatus = function (msg, type = "info") {
+      const el = document.getElementById("bookingStatus");
+      if (!el) return;
+      if (window._statusTimeout) { clearTimeout(window._statusTimeout); window._statusTimeout = null; }
+      el.classList.remove("show", "text-danger", "text-success", "text-muted");
+      el.textContent = msg;
+      void el.offsetHeight;
+      if (type === "error") el.classList.add("text-danger");
+      else if (type === "success") el.classList.add("text-success");
+      else el.classList.add("text-muted");
+      el.classList.add("show");
+      window._statusTimeout = setTimeout(() => { el.classList.remove("show"); window._statusTimeout = null; }, type === "success" ? 5000 : 7000);
+    };
 
-    document.body.dataset.unitId = id;
-
-    document.getElementById("rentalTitle").textContent =
-      unit.name || "Rental Unit";
-
-    document.getElementById("rentalDescription").textContent =
-      unit.description || "";
-
-    document.getElementById("unitLongDescription").textContent =
-      unit.longDescription || unit.description || "";
-
-    document.getElementById("unitLocation").textContent =
-      unit.location || "Location not specified";
-
-    document.getElementById("unitPrice").textContent =
-      `$${unit.pricePerNight || 35}/night`;
-
-    renderGallery(unit);
-    renderAmenities(unit.amenities);
-
-  } catch (err) {
-    console.error("Failed to load unit:", err);
-    document.getElementById("rentalTitle").textContent = "Failed to load unit";
-    showStatus("Failed to load rental details", "error");
-  } finally {
-    showLoading(false);
-  }
-}
-
-/* ===============================
-   GALLERY RENDERING
-================================ */
-function renderGallery(unit) {
-  const gallery = document.getElementById("rentalGallery");
-  if (!gallery) return;
-
-  gallery.innerHTML = "";
-
-  const images = [];
-
-  if (unit.image) {
-    if (typeof unit.image === "string" && unit.image.includes(",")) {
-      unit.image.split(",").map(s => s.trim()).forEach(i => images.push(i));
-    } else {
-      images.push(unit.image);
-    }
-  }
-
-  if (!images.length) {
-    const img = document.createElement("img");
-    img.src = "/img/placeholder.jpg";
-    img.alt = "No image available";
-    gallery.appendChild(img);
-    return;
-  }
-
-  images.forEach(path => {
-    let src = path;
-    if (!path.startsWith("http") && !path.startsWith("/")) {
-      src = path.startsWith("img/") ? `/${path}` : `/img/${path}`;
-    }
-    const img = document.createElement("img");
-    img.src = src;
-    img.alt = unit.name || "Unit image";
-    gallery.appendChild(img);
-  });
-}
-
-/* ===============================
-   AMENITIES RENDERING
-================================ */
-function renderAmenities(amenities = []) {
-  const amenitiesEl = document.getElementById("unitAmenities");
-  if (!amenitiesEl) return;
-
-  amenitiesEl.innerHTML = "";
-
-  if (!Array.isArray(amenities) || !amenities.length) {
-    amenitiesEl.innerHTML = "<li>No amenities listed</li>";
-    return;
-  }
-
-  amenities.forEach(item => {
-    const li = document.createElement("li");
-    li.textContent = `✔ ${item}`;
-    amenitiesEl.appendChild(li);
-  });
-}
-
-/* ===============================
-   PHONE HELPERS
-================================ */
-function normalizeKenyanPhone(input) {
-  if (!input) return null;
-
-  let phone = input.replace(/\s+/g, "");
-
-  if (phone.startsWith("0")) phone = "+254" + phone.slice(1);
-  else if (phone.startsWith("254")) phone = "+" + phone;
-  else if (phone.startsWith("7")) phone = "+254" + phone;
-
-  return phone;
-}
-
-function isValidKenyanPhone(phone) {
-  return /^\+2547\d{8}$/.test(phone);
-}
-
-/* ===============================
-   DOM READY
-================================ */
-document.addEventListener("DOMContentLoaded", () => {
-  loadRentalDetails();
-
-  // Existing payment method toggle logic
-  const paymentSelect = document.getElementById("paymentMethod");
-  const mpesaWrapper = document.getElementById("mpesaFieldWrapper");
-  const emailWrapper = document.getElementById("emailFieldWrapper"); // ADD THIS
-
-
-  paymentSelect.addEventListener("change", e => {
-    mpesaWrapper.classList.toggle("hidden", e.target.value !== "mpesa");
-     emailWrapper.classList.toggle("hidden", e.target.value !== "visa"); // ADD THIS
-
-  });
-  if (paymentSelect.value !== "mpesa") mpesaWrapper.classList.add("hidden");
-  if (paymentSelect.value !== "visa") emailWrapper.classList.add("hidden"); // ADD THIS
-
-
-
-
-
-
-
-
-
-  /* ===============================
-     BOOKING ACTION
-  =============================== */
-  document.getElementById("bookBtn").addEventListener("click", async () => {
-    const rawGuestPhone = document.getElementById("guestPhone").value;
-    const guestPhone = normalizeKenyanPhone(rawGuestPhone);
-
-    if (!guestPhone || !isValidKenyanPhone(guestPhone)) {
-      showStatus("Enter a valid phone number (07XXXXXXXX)", "error");
-      return;
+    /* ── Amenity icon map ── */
+    const amenityIcons = {
+      'wifi': '📶', 'wi-fi': '📶', 'tv': '📺', 'smart tv': '📺', 'kitchen': '🍳',
+      'shower': '🚿', 'hot shower': '🚿', 'parking': '🅿️', 'pool': '🏊', 'gym': '💪',
+      'air conditioning': '❄️', 'ac': '❄️', 'laundry': '👕', 'security': '🔒',
+      'balcony': '🌅', 'workspace': '💻', 'garden': '🌿', 'bbq': '🔥', 'default': '✔️'
+    };
+    function getAmenityIcon(name) {
+      const key = name.toLowerCase().trim();
+      for (const [k, v] of Object.entries(amenityIcons)) { if (key.includes(k)) return v; }
+      return amenityIcons.default;
     }
 
-    let phoneNumber = guestPhone;
+    /* ── Load rental details ── */
+    async function loadRentalDetails(incomingId) {
+      const id = incomingId || unitId;
+      if (!id) { document.getElementById("rentalTitle").textContent = "Unit not specified"; return; }
+      try {
+        showLoading(true);
+        const res = await fetch(`${BASE_URL}/units/${id}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const unit = await res.json();
+        document.body.dataset.unitId = id;
+        document.getElementById("rentalTitle").textContent = unit.name || "Rental Unit";
+        const desc = document.getElementById("rentalDescription");
+        if (desc) desc.textContent = unit.description || "";
+        document.getElementById("unitLongDescription").textContent = unit.longDescription || unit.description || "";
+        const loc = unit.location || "Location not specified";
+        document.getElementById("unitLocation").textContent = loc;
+        document.getElementById("heroLocation").textContent = loc;
+        document.getElementById("hlLocation").textContent = loc.split(",")[0] || loc;
+        document.getElementById("unitPrice").textContent = `$${unit.pricePerNight || 35}`;
+        document.getElementById("mobilePrice").textContent = `$${unit.pricePerNight || 35}`;
+        renderGallery(unit);
+        renderAmenities(unit.amenities);
+      } catch (err) {
+        console.error("Failed to load unit:", err);
+        document.getElementById("rentalTitle").textContent = "Failed to load unit";
+        showStatus("Failed to load rental details", "error");
+      } finally { showLoading(false); }
+    }
 
-    if (paymentSelect.value === "mpesa") {
-      const rawMpesaPhone = document.getElementById("mpesaPhone").value;
-      const mpesaPhone = normalizeKenyanPhone(rawMpesaPhone);
+    /* ── Gallery ── */
+    function renderGallery(unit) {
+      const gallery = document.getElementById("rentalGallery");
+      if (!gallery) return;
+      gallery.innerHTML = "";
+      const images = [];
+      if (unit.image) {
+        if (typeof unit.image === "string" && unit.image.includes(","))
+          unit.image.split(",").map(s => s.trim()).forEach(i => images.push(i));
+        else images.push(unit.image);
+      }
+      if (!images.length) {
+        const img = document.createElement("img");
+        img.src = "/img/placeholder.jpg"; img.alt = "No image"; gallery.appendChild(img); return;
+      }
+      images.forEach(path => {
+        let src = path;
+        if (!path.startsWith("http") && !path.startsWith("/"))
+          src = path.startsWith("img/") ? `/${path}` : `/img/${path}`;
+        const img = document.createElement("img");
+        img.src = src; img.alt = unit.name || "Unit image"; gallery.appendChild(img);
+      });
+    }
 
-      if (!mpesaPhone || !isValidKenyanPhone(mpesaPhone)) {
-        showStatus("Enter a valid M-Pesa phone number", "error");
+    /* ── Amenities ── */
+    function renderAmenities(amenities = []) {
+      const el = document.getElementById("unitAmenities");
+      if (!el) return;
+      el.innerHTML = "";
+      if (!Array.isArray(amenities) || !amenities.length) {
+        el.innerHTML = '<li class="amenity-item"><span class="amenity-icon">—</span> No amenities listed</li>';
         return;
       }
-
-      phoneNumber = mpesaPhone;
+      amenities.forEach(item => {
+        const li = document.createElement("li");
+        li.className = "amenity-item";
+        li.innerHTML = `<span class="amenity-icon">${getAmenityIcon(item)}</span> ${item}`;
+        el.appendChild(li);
+      });
     }
 
-    console.log("Booking phone number:", phoneNumber);
-    // proceed with booking API
-  });
-});
-</script>
+    /* ── Phone helpers ── */
+    function normalizeKenyanPhone(input) {
+      if (!input) return null;
+      let p = input.replace(/\s+/g, "");
+      if (p.startsWith("0")) p = "+254" + p.slice(1);
+      else if (p.startsWith("254")) p = "+" + p;
+      else if (p.startsWith("7")) p = "+254" + p;
+      return p;
+    }
+    function isValidKenyanPhone(phone) { return /^\+2547\d{8}$/.test(phone); }
 
+    /* ── FAQ accordion ── */
+    document.querySelectorAll(".faq-question").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const item = btn.closest(".faq-item");
+        const wasOpen = item.classList.contains("open");
+        document.querySelectorAll(".faq-item.open").forEach(i => i.classList.remove("open"));
+        if (!wasOpen) item.classList.add("open");
+      });
+    });
 
-<script src="js/nav.js"></script>
-<script type="module" src="js/booking.js"></script>
+    /* ── Scroll reveal ── */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
 
+    /* ── Reviews modal ── */
+    const modalOverlay = document.getElementById("reviewsModalOverlay");
+    document.getElementById("viewAllReviewsBtn")?.addEventListener("click", () => modalOverlay?.classList.add("open"));
+    document.getElementById("closeReviewsModal")?.addEventListener("click", () => modalOverlay?.classList.remove("open"));
+    modalOverlay?.addEventListener("click", (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove("open"); });
+
+    /* ── Payment method toggle ── */
+    document.addEventListener("DOMContentLoaded", () => {
+      loadRentalDetails();
+      const paymentSelect = document.getElementById("paymentMethod");
+      const mpesaW = document.getElementById("mpesaFieldWrapper");
+      const emailW = document.getElementById("emailFieldWrapper");
+      const cryptoW = document.getElementById("cryptoFieldWrapper");
+      const cards = document.querySelectorAll(".pay-method-card");
+      function setMethod(m) {
+        cards.forEach(c => c.classList.toggle("active", c.dataset.method === m));
+        paymentSelect.value = m;
+        if (mpesaW) mpesaW.style.display = m === "mpesa" ? "block" : "none";
+        if (emailW) emailW.style.display = m === "visa" ? "block" : "none";
+        if (cryptoW) cryptoW.style.display = m === "crypto" ? "block" : "none";
+      }
+      cards.forEach(c => c.addEventListener("click", () => setMethod(c.dataset.method)));
+      if (paymentSelect) setMethod(paymentSelect.value);
+
+      /* ── Book button ── */
+      document.getElementById("bookBtn").addEventListener("click", async () => {
+        const raw = document.getElementById("guestPhone").value;
+        const phone = normalizeKenyanPhone(raw);
+        if (!phone || !isValidKenyanPhone(phone)) { showStatus("Enter a valid phone number (07XXXXXXXX)", "error"); return; }
+        let phoneNumber = phone;
+        if (paymentSelect.value === "mpesa") {
+          const rawM = document.getElementById("mpesaPhone").value;
+          const mpesa = normalizeKenyanPhone(rawM);
+          if (!mpesa || !isValidKenyanPhone(mpesa)) { showStatus("Enter a valid M-Pesa phone number", "error"); return; }
+          phoneNumber = mpesa;
+        }
+        console.log("Booking phone:", phoneNumber);
+      });
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
+  <script src="js/nav.js"></script>
+  <script type="module" src="js/booking.js"></script>
+
+  <script>
+    // ── REVIEWS MODULE ──
+    document.addEventListener("DOMContentLoaded", () => {
+      const API_BASE = window.location.hostname === "localhost" ? "http://localhost:5000" : "https://alina906vibes-backend.onrender.com";
+      const urlParams = new URLSearchParams(window.location.search);
+      const unitId = urlParams.get("id");
+      const token = localStorage.getItem("userToken") || localStorage.getItem("token");
+      if (!unitId) return;
+
+      const reviewsList = document.getElementById("reviewsList");
+      const reviewsEmpty = document.getElementById("reviewsEmpty");
+      const avgBadge = document.getElementById("avgBadge");
+      const avgRating = document.getElementById("avgRating");
+      const reviewCount = document.getElementById("reviewCount");
+      const formWrapper = document.getElementById("reviewFormWrapper");
+      const reviewForm = document.getElementById("reviewForm");
+      const statusEl = document.getElementById("reviewStatus");
+      const ratingInput = document.getElementById("selectedRating");
+      const commentInput = document.getElementById("reviewComment");
+      const charCount = document.getElementById("charCount");
+      const submitBtn = document.getElementById("submitReviewBtn");
+      const starSelector = document.getElementById("starSelector");
+      const stars = starSelector.querySelectorAll(".star-btn");
+      const viewAllBtn = document.getElementById("viewAllReviewsBtn");
+      const modalList = document.getElementById("modalReviewsList");
+
+      if (token) formWrapper.style.display = "block";
+
+      stars.forEach(star => {
+        star.addEventListener("mouseenter", () => {
+          const val = +star.dataset.value;
+          stars.forEach(s => s.classList.toggle("hovered", +s.dataset.value <= val));
+        });
+      });
+      starSelector.addEventListener("mouseleave", () => stars.forEach(s => s.classList.remove("hovered")));
+      stars.forEach(star => {
+        star.addEventListener("click", () => {
+          const val = +star.dataset.value;
+          ratingInput.value = val;
+          stars.forEach(s => s.classList.toggle("selected", +s.dataset.value <= val));
+        });
+      });
+      commentInput.addEventListener("input", () => { charCount.textContent = `${commentInput.value.length}/500`; });
+
+      async function loadReviews() {
+        try {
+          const res = await fetch(`${API_BASE}/api/reviews/${unitId}`);
+          const data = await res.json();
+          if (!data.success) return;
+          if (data.count > 0) {
+            avgBadge.style.display = "inline-flex";
+            avgRating.textContent = data.average;
+            reviewCount.textContent = `(${data.count})`;
+            // Populate sidebar + highlights
+            const sr = document.getElementById("sidebarRating");
+            const hr = document.getElementById("hlRating");
+            if (sr) sr.textContent = data.average;
+            if (hr) hr.textContent = `${data.average} ★`;
+          }
+          if (data.reviews.length === 0) { reviewsEmpty.style.display = "flex"; return; }
+          reviewsEmpty.style.display = "none";
+          if (data.reviews.length > 3) viewAllBtn.style.display = "";
+          if (token) {
+            try {
+              const user = JSON.parse(localStorage.getItem("loggedInUser"));
+              if (user) {
+                const userId = user.id || user._id;
+                if (data.reviews.some(r => r.userId === userId)) formWrapper.style.display = "none";
+              }
+            } catch (e) { }
+          }
+          data.reviews.forEach(review => {
+            const card = createReviewCard(review);
+            reviewsList.appendChild(card);
+            if (modalList) modalList.appendChild(createReviewCard(review));
+          });
+        } catch (err) { console.error("Failed to load reviews:", err); }
+      }
+
+      function createReviewCard(review) {
+        const card = document.createElement("div");
+        card.className = "review-card";
+        const starsHtml = renderStars(review.rating);
+        const date = new Date(review.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+        card.innerHTML = `<div class="review-card-header"><div class="reviewer-info"><div class="reviewer-avatar">${(review.userName || "?")[0].toUpperCase()}</div><div><div class="reviewer-name">${escapeHtml(review.userName)}</div><div class="review-date">${date}</div></div></div><div class="review-stars">${starsHtml}</div></div>${review.comment ? `<p class="review-text">${escapeHtml(review.comment)}</p>` : ""}`;
+        return card;
+      }
+      function renderStars(r) { let h = ""; for (let i = 1; i <= 5; i++) h += `<span class="star-icon ${i <= r ? "filled" : ""}">★</span>`; return h; }
+      function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+      reviewForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const rating = +ratingInput.value, comment = commentInput.value.trim();
+        if (!rating || rating < 1 || rating > 5) { showReviewStatus("Please select a star rating.", "error"); return; }
+        submitBtn.disabled = true; submitBtn.classList.add("loading");
+        try {
+          const res = await fetch(`${API_BASE}/api/reviews/${unitId}`, {
+            method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ rating, comment })
+          });
+          const data = await res.json();
+          if (!res.ok) { showReviewStatus(data.message || "Failed to submit review.", "error"); submitBtn.disabled = false; submitBtn.classList.remove("loading"); return; }
+          showReviewStatus("Review submitted!", "success");
+          formWrapper.style.display = "none";
+          reviewsEmpty.style.display = "none";
+          const card = createReviewCard(data.review);
+          reviewsList.prepend(card);
+          const cc = +(reviewCount.textContent.replace(/[()]/g, "") || 0);
+          const ca = +(avgRating.textContent || 0);
+          const nc = cc + 1;
+          const na = ((ca * cc + rating) / nc).toFixed(1);
+          avgBadge.style.display = "inline-flex";
+          avgRating.textContent = na;
+          reviewCount.textContent = `(${nc})`;
+        } catch (err) { console.error("Submit review error:", err); showReviewStatus("Something went wrong.", "error"); submitBtn.disabled = false; submitBtn.classList.remove("loading"); }
+      });
+
+      function showReviewStatus(msg, type) {
+        statusEl.textContent = msg; statusEl.className = `review-status ${type}`;
+        setTimeout(() => { statusEl.className = "review-status"; statusEl.textContent = ""; }, 4000);
+      }
+      loadReviews();
+    });
+  </script>
 </body>
+
 </html>

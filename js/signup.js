@@ -1,23 +1,63 @@
-// frontend/js/signup.js
+// signup.js — Premium interactive signup
 document.addEventListener("DOMContentLoaded", () => {
   const API_BASE =
-  window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://alina906vibes-backend.onrender.com";
-  const form = document.querySelector("#signupForm");
+    window.location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : "https://alina906vibes-backend.onrender.com";
+
+  const form = document.getElementById("signupForm");
+  const btn = document.getElementById("signupBtn");
+  const statusMsg = document.getElementById("statusMsg");
+
   if (!form) return;
 
+  // Password toggle
+  const toggle = document.querySelector(".password-toggle");
+  const pwField = document.getElementById("signupPassword");
+  if (toggle && pwField) {
+    toggle.addEventListener("click", () => {
+      const isPassword = pwField.type === "password";
+      pwField.type = isPassword ? "text" : "password";
+      toggle.textContent = isPassword ? "🙈" : "👁";
+    });
+  }
+
+  // Status helpers
+  function showStatus(msg, type) {
+    statusMsg.textContent = msg;
+    statusMsg.className = `status-msg ${type}`;
+  }
+
+  function clearStatus() {
+    statusMsg.className = "status-msg";
+    statusMsg.textContent = "";
+  }
+
+  function setLoading(loading) {
+    btn.disabled = loading;
+    btn.classList.toggle("loading", loading);
+  }
+
+  // Form submit
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    clearStatus();
 
-    const username = document.querySelector("#username").value.trim();
-    const email = document.querySelector("#signupEmail").value.trim();
-    const password = document.querySelector("#signupPassword").value;
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("signupEmail").value.trim();
+    const password = pwField.value;
 
     if (!username || !email || !password) {
-      alert("Please fill in all fields.");
+      showStatus("Please fill in all fields.", "error");
       return;
     }
+
+    if (password.length < 6) {
+      showStatus("Password must be at least 6 characters.", "error");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch(`${API_BASE}/api/auth/signup`, {
@@ -27,17 +67,25 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Signup failed");
 
-      // ✅ Only notify user — no redirect
-      alert("✅ Verification email sent. Please check your inbox to verify your account.");
-      // Optionally redirect to login page after a short delay
+      if (!res.ok) {
+        showStatus(data.message || "Signup failed. Please try again.", "error");
+        setLoading(false);
+        return;
+      }
+
+      // Success
+      showStatus("Verification email sent! Check your inbox.", "success");
+      btn.disabled = true;
+
+      // Redirect to login after a moment
       setTimeout(() => {
         window.location.href = "login.html";
-      }, 2000);
-
+      }, 3000);
     } catch (err) {
-      alert("❌ " + err.message);
+      console.error("Signup error:", err);
+      showStatus("Something went wrong. Please try again.", "error");
+      setLoading(false);
     }
   });
 });

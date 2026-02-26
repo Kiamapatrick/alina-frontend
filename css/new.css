@@ -27,9 +27,11 @@ body {
   line-height: 1.6;
 }
 
-/* ===============================
-   HEADER
-================================= */
+/* ═══════════════════════════════════════════
+   NAVBAR — Styles now in css/navbar.css
+   ═════════════════════════════════════════ */
+
+/* Old header element (fallback) */
 header {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -173,6 +175,7 @@ header nav .btn-success:hover {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -275,6 +278,7 @@ header nav .btn-success:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
 }
+
 /* Premium Rental Cards */
 .card {
   border: none;
@@ -285,7 +289,7 @@ header nav .btn-success:hover {
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
 

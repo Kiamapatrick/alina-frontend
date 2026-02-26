@@ -2,10 +2,10 @@
 // booking.js — Two-Phase Payment System
 // ===============================
 
-import { 
-  connectWallet, 
-  isWalletConnected, 
-  getWalletAddress, 
+import {
+  connectWallet,
+  isWalletConnected,
+  getWalletAddress,
   payDeposit,
   payBalance,
   disconnectWallet,
@@ -25,7 +25,7 @@ const API_BASE = window.location.hostname === 'localhost'
   : 'https://alina906vibes-backend.onrender.com';
 
 const TOKEN_KEY = 'userToken';
-const FIXED_DEPOSIT = 5; 
+const FIXED_DEPOSIT = 5;
 const PRICING = {
   perNight: 8
 };
@@ -100,8 +100,8 @@ function showLoading(show = true) {
 function calculateNights(start, end) {
   const s = new Date(start);
   const e = new Date(end);
-  s.setHours(0,0,0,0);
-  e.setHours(0,0,0,0);
+  s.setHours(0, 0, 0, 0);
+  e.setHours(0, 0, 0, 0);
   return (e - s) / (1000 * 60 * 60 * 24);
 }
 
@@ -113,12 +113,12 @@ function calculatePaymentAmounts(nights) {
   const fullAmount = nights * PRICING.perNight;
   const depositAmount = FIXED_DEPOSIT;
   const balanceAmount = fullAmount - depositAmount;
-  
+
   paymentState.nights = nights;
   paymentState.fullAmount = fullAmount;
   paymentState.depositAmount = depositAmount;
   paymentState.balanceAmount = balanceAmount > 0 ? balanceAmount : 0;
-  
+
   updatePaymentAmount();
 }
 
@@ -142,36 +142,52 @@ function updatePaymentUI() {
   if (nightsEl) {
     nightsEl.textContent = paymentState.nights;
   }
-  
+
   const fullAmountEl = document.getElementById('fullAmount');
   if (fullAmountEl) {
     fullAmountEl.textContent = `KES ${paymentState.fullAmount.toFixed(2)}`;
   }
-  
+
   const depositAmountEl = document.getElementById('depositAmount');
   if (depositAmountEl) {
     depositAmountEl.textContent = `KES ${paymentState.depositAmount.toFixed(2)}`;
   }
-  
+
   const balanceAmountEl = document.getElementById('balanceAmount');
   if (balanceAmountEl) {
     balanceAmountEl.textContent = `KES ${paymentState.balanceAmount.toFixed(2)}`;
   }
-  
+
   const fullAmountLabelEl = document.getElementById('fullAmountLabel');
   if (fullAmountLabelEl) {
     fullAmountLabelEl.textContent = `Pay Full Amount (KES ${paymentState.fullAmount.toFixed(2)})`;
   }
-  
+
   const bookBtn = document.getElementById('bookBtn');
   if (bookBtn) {
-    bookBtn.textContent = `Pay KES ${paymentState.amountToPayNow.toFixed(2)}`;
+    // Preserve inner span structure if it exists
+    const btnSpan = document.getElementById('btnPayAmount');
+    if (btnSpan) {
+      btnSpan.textContent = `KES ${paymentState.amountToPayNow.toFixed(2)}`;
+    } else {
+      bookBtn.textContent = `Pay KES ${paymentState.amountToPayNow.toFixed(2)}`;
+    }
+  }
+
+  // Sync mobile bottom bar price
+  const mobilePrice = document.getElementById('mobilePrice');
+  const mobilePriceDetail = document.getElementById('mobilePriceDetail');
+  if (mobilePrice && paymentState.nights > 0) {
+    mobilePrice.textContent = `KES ${paymentState.amountToPayNow.toFixed(0)}`;
+    if (mobilePriceDetail) {
+      mobilePriceDetail.textContent = `${paymentState.nights} night${paymentState.nights > 1 ? 's' : ''}`;
+    }
   }
 }
 
 function setupPaymentTypeListeners() {
   const paymentTypeRadios = document.querySelectorAll('input[name="paymentType"]');
-  
+
   paymentTypeRadios.forEach(radio => {
     radio.addEventListener('change', (e) => {
       paymentState.paymentType = e.target.value;
@@ -183,11 +199,11 @@ function setupPaymentTypeListeners() {
 function setupDateChangeListeners() {
   const startDateEl = document.getElementById('startDate');
   const endDateEl = document.getElementById('endDate');
-  
+
   const handleDateChange = () => {
     const startDate = startDateEl?.value;
     const endDate = endDateEl?.value;
-    
+
     if (startDate && endDate) {
       const nights = calculateNights(startDate, endDate);
       if (nights > 0) {
@@ -195,11 +211,11 @@ function setupDateChangeListeners() {
       }
     }
   };
-  
+
   if (startDateEl) {
     startDateEl.addEventListener('change', handleDateChange);
   }
-  
+
   if (endDateEl) {
     endDateEl.addEventListener('change', handleDateChange);
   }
@@ -208,96 +224,297 @@ function setupDateChangeListeners() {
 // ===============================
 // CALENDAR FUNCTIONS
 // ===============================
+
+/**
+ * Format a Date object as 'YYYY-MM-DD' in LOCAL time.
+ * NEVER use toISOString().split('T')[0] — that converts to UTC
+ * and produces off-by-one errors in positive-offset timezones (e.g. UTC+3).
+ */
+function toLocalDateStr(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * Build a Set of 'YYYY-MM-DD' strings for all BOOKED NIGHTS.
+ * Uses the exclusive end-date model:
+ *   - Marks check-in date through last night (endDate - 1 day)
+ *   - The checkout date (endDate) itself is NOT marked → available for next guest
+ */
 function getBookedDays(bookings) {
   const booked = new Set();
 
-  console.log('🔍 Processing bookings for calendar:', bookings.length);
+  bookings.forEach(b => {
+    const isReserved = b.depositPaid || b.balancePaid ||
+      b.paymentStatus === 'confirmed' ||
+      b.status === 'confirmed';
 
-  bookings.forEach((b, index) => {
-    // ✅ Mark days if EITHER deposit OR balance is paid
-    const isReserved = b.depositPaid || b.balancePaid || 
-                      b.paymentStatus === 'confirmed' || 
-                      b.status === 'confirmed';
-
-    console.log(`Booking ${index + 1}:`, {
-      startDate: b.startDate,
-      endDate: b.endDate,
-      depositPaid: b.depositPaid,
-      balancePaid: b.balancePaid,
-      isReserved
-    });
-
-    if (!isReserved) {
-      console.log(`  ⏭️ Skipping (not reserved)`);
-      return;
-    }
+    if (!isReserved) return;
 
     const start = new Date(b.startDate);
     const end = new Date(b.endDate);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
 
-    start.setUTCHours(0, 0, 0, 0);
-    end.setUTCHours(0, 0, 0, 0);
-
+    // Mark each night: check-in up to (but NOT including) check-out
     const current = new Date(start);
-    let markedDays = [];
-
-while (current < end) {
-  const dateStr = current.toISOString().split('T')[0];
-  booked.add(dateStr);
-  markedDays.push(dateStr);
-  current.setDate(current.getDate() + 1);
-}
-
-
-    console.log(`  ✅ Marked days:`, markedDays);
+    while (current < end) {
+      booked.add(toLocalDateStr(current));
+      current.setDate(current.getDate() + 1);
+    }
+    // checkout day is NOT added → stays available
   });
 
-  const allBookedDays = Array.from(booked).sort();
-  console.log('🗓️ Total booked days:', allBookedDays.length, allBookedDays);
-
   return booked;
+}
+
+// ── Calendar selection state ──
+let calendarSelection = {
+  startDate: null,   // 'YYYY-MM-DD' or null  (check-in)
+  endDate: null,     // 'YYYY-MM-DD' or null  (exclusive checkout)
+  bookedSet: null    // Set of booked date strings
+};
+
+/**
+ * Check if every night from `from` up to (but NOT including) `to` is free.
+ * Both `from` and `to` are 'YYYY-MM-DD' strings.
+ */
+function isRangeFree(from, to, bookedSet) {
+  const cur = new Date(from + 'T12:00:00'); // noon to avoid DST edge cases
+  const end = new Date(to + 'T12:00:00');
+  while (cur < end) {
+    if (bookedSet.has(toLocalDateStr(cur))) return false;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return true;
+}
+
+/**
+ * Return the calendar day after `dateStr` as 'YYYY-MM-DD'.
+ */
+function nextDay(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00'); // noon avoids any DST issues
+  d.setDate(d.getDate() + 1);
+  return toLocalDateStr(d);
+}
+
+/** Is the given 'YYYY-MM-DD' before today? */
+function isInPast(dateStr) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const d = new Date(dateStr + 'T00:00:00');
+  return d < today;
+}
+
+/**
+ * Apply visual selection styling to calendar day cells.
+ * Highlights BOOKED NIGHTS only: check-in ≤ date < checkout.
+ * The checkout day cell is NOT highlighted.
+ */
+function applySelectionVisuals() {
+  const cells = document.querySelectorAll('#calendar .calendar-day[data-date]');
+  cells.forEach(cell => {
+    cell.classList.remove('cal-selected', 'cal-range', 'cal-start', 'cal-end');
+  });
+
+  if (!calendarSelection.startDate) return;
+
+  const checkoutStr = calendarSelection.endDate || nextDay(calendarSelection.startDate);
+
+  cells.forEach(cell => {
+    const ds = cell.dataset.date;
+    // Highlight if: check-in ≤ ds < checkout
+    if (ds >= calendarSelection.startDate && ds < checkoutStr) {
+      cell.classList.add('cal-selected');
+
+      if (ds === calendarSelection.startDate) cell.classList.add('cal-start');
+
+      // Last booked night = day before checkout
+      const lastNightStr = prevDay(checkoutStr);
+      if (ds === lastNightStr) cell.classList.add('cal-end');
+
+      // Middle cells
+      if (ds > calendarSelection.startDate && ds < lastNightStr) cell.classList.add('cal-range');
+    }
+  });
+}
+
+/** Return the calendar day before `dateStr` as 'YYYY-MM-DD'. */
+function prevDay(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() - 1);
+  return toLocalDateStr(d);
+}
+
+/**
+ * Push the current selection into the #startDate and #endDate inputs
+ * and trigger payment recalculation.
+ */
+function syncSelectionToInputs() {
+  const startEl = document.getElementById('startDate');
+  const endEl = document.getElementById('endDate');
+  if (!startEl || !endEl) return;
+
+  if (calendarSelection.startDate) {
+    const checkin = calendarSelection.startDate;
+    const checkout = calendarSelection.endDate || nextDay(calendarSelection.startDate);
+
+    startEl.value = checkin;
+    endEl.value = checkout;
+
+    // nights = number of selected dates = checkout − checkin in days
+    const nights = calculateNights(checkin, checkout);
+    if (nights > 0) calculatePaymentAmounts(nights);
+  } else {
+    startEl.value = '';
+    endEl.value = '';
+  }
+}
+
+/**
+ * Handle a click on an available calendar day cell.
+ *
+ * Exclusive end-date model:
+ *   - Selected dates = booked nights (guest sleeps there).
+ *   - Checkout = day AFTER last selected night.
+ *   - Select 5th only     → checkin=5, checkout=6, 1 night.  Mark: [5].
+ *   - Select 5th then 8th → checkin=5, checkout=9, 4 nights. Mark: [5,6,7,8].
+ *   - Checkout day (6 or 9) is NEVER marked booked.
+ */
+function handleCalendarDayClick(dateStr) {
+  const bookedSet = calendarSelection.bookedSet;
+
+  if (isInPast(dateStr)) {
+    showStatus('Cannot select dates in the past', 'error');
+    return;
+  }
+
+  // ── First click: check-in, checkout = next day ──
+  if (!calendarSelection.startDate) {
+    calendarSelection.startDate = dateStr;
+    calendarSelection.endDate = nextDay(dateStr);
+    applySelectionVisuals();
+    syncSelectionToInputs();
+    return;
+  }
+
+  // ── Click same start → reset ──
+  if (dateStr === calendarSelection.startDate) {
+    calendarSelection.startDate = null;
+    calendarSelection.endDate = null;
+    applySelectionVisuals();
+    syncSelectionToInputs();
+    return;
+  }
+
+  // ── Click BEFORE current start → move start earlier ──
+  if (dateStr < calendarSelection.startDate) {
+    const existingEnd = calendarSelection.endDate;
+    if (!isRangeFree(dateStr, existingEnd, bookedSet)) {
+      showStatus('Cannot select a range that includes booked dates', 'error');
+      return;
+    }
+    calendarSelection.startDate = dateStr;
+    applySelectionVisuals();
+    syncSelectionToInputs();
+    return;
+  }
+
+  // ── Click AFTER current start → last selected night ──
+  // checkout = clicked + 1 day (exclusive)
+  const newCheckout = nextDay(dateStr);
+  if (!isRangeFree(calendarSelection.startDate, newCheckout, bookedSet)) {
+    showStatus('Cannot select a range that includes booked dates', 'error');
+    return;
+  }
+
+  calendarSelection.endDate = newCheckout;
+  applySelectionVisuals();
+  syncSelectionToInputs();
+}
+
+/**
+ * Show a hover preview of the potential range.
+ */
+function handleCalendarDayHover(dateStr) {
+  if (!calendarSelection.startDate) return;
+
+  const cells = document.querySelectorAll('#calendar .calendar-day[data-date]');
+  cells.forEach(c => c.classList.remove('cal-hover'));
+
+  if (dateStr <= calendarSelection.startDate) return;
+
+  const potentialEnd = nextDay(dateStr);
+  if (!isRangeFree(calendarSelection.startDate, potentialEnd, calendarSelection.bookedSet)) return;
+
+  cells.forEach(cell => {
+    const ds = cell.dataset.date;
+    if (ds >= calendarSelection.startDate && ds <= dateStr && !cell.classList.contains('booked')) {
+      cell.classList.add('cal-hover');
+    }
+  });
 }
 
 function renderCalendar(bookings) {
   const calendar = document.getElementById('calendar');
   const monthYear = document.getElementById('monthYear');
-  
+
   if (!calendar || !monthYear) return;
-  
+
   calendar.innerHTML = '';
-  
+
   const bookedDays = getBookedDays(bookings);
+  calendarSelection.bookedSet = bookedDays;
+
   const firstDay = new Date(currentYear, currentMonth, 1);
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  
-  monthYear.textContent = firstDay.toLocaleString('default', { 
-    month: 'long', 
-    year: 'numeric' 
+
+  monthYear.textContent = firstDay.toLocaleString('default', {
+    month: 'long',
+    year: 'numeric'
   });
-  
+
   let startDay = firstDay.getDay();
   startDay = startDay === 0 ? 6 : startDay - 1;
-  
+
   for (let i = 0; i < startDay; i++) {
     const empty = document.createElement('div');
     empty.className = 'calendar-day other-month';
     calendar.appendChild(empty);
   }
-  
+
+  const todayStr = toLocalDateStr(new Date());
+
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
     const cell = document.createElement('div');
     cell.className = 'calendar-day';
     cell.textContent = d;
-    
+    cell.dataset.date = dateStr;
+
     if (bookedDays.has(dateStr)) {
       cell.classList.add('booked');
+      cell.title = 'Booked';
+    } else if (dateStr < todayStr) {
+      cell.classList.add('past');
+      cell.title = 'Past date';
     } else {
       cell.classList.add('available');
+      cell.title = 'Available — click to select';
+      cell.addEventListener('click', () => handleCalendarDayClick(dateStr));
+      cell.addEventListener('mouseenter', () => handleCalendarDayHover(dateStr));
     }
-    
+
     calendar.appendChild(cell);
   }
+
+  calendar.addEventListener('mouseleave', () => {
+    document.querySelectorAll('#calendar .cal-hover').forEach(c => c.classList.remove('cal-hover'));
+  });
+
+  applySelectionVisuals();
 }
 
 async function loadCalendar() {
@@ -305,10 +522,10 @@ async function loadCalendar() {
   try {
     const res = await fetch(`${API_BASE}/api/calendar/${unitId}`);
     const data = await res.json();
-    
+
     console.log('📅 Calendar data:', data);
     console.log('📅 Number of bookings:', data.bookings?.length || 0);
-    
+
     renderCalendar(data.bookings || []);
   } catch (err) {
     console.error('Calendar fetch error:', err);
@@ -321,27 +538,27 @@ async function loadCalendar() {
 async function cancelBooking(bookingId) {
   const token = getToken();
   if (!token) return;
-  
+
   if (!confirm('Cancel this booking? Refund policy applies.')) return;
-  
+
   showLoading(true);
-  
+
   try {
     const res = await fetch(`${API_BASE}/api/book/cancel/${bookingId}`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     });
-    
+
     const result = await res.json();
-    
+
     if (!res.ok) {
       showStatus(`Failed to cancel: ${result.error || 'Unknown error'}`, 'error');
       return;
     }
-    
+
     showStatus(' Booking canceled successfully!', 'success');
     await loadUserBookings();
     await loadCalendar();
@@ -371,8 +588,8 @@ async function loadUserBookings() {
 
     const bookingsCount = data.bookings?.length || 0;
 
-// Create dropdown structure with filter bar
-container.innerHTML = `
+    // Create dropdown structure with filter bar
+    container.innerHTML = `
   <div class="bookings-header" id="bookingsHeaderToggle">
     <h6>
       Your Bookings
@@ -413,7 +630,7 @@ container.innerHTML = `
     headerToggle.addEventListener('click', (e) => {
       // Don't toggle if clicking refresh button
       if (e.target.closest('#refreshBookingsBtn')) return;
-      
+
       bookingsContent.classList.toggle('open');
       toggleIcon.classList.toggle('open');
     });
@@ -428,30 +645,30 @@ container.innerHTML = `
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-// Populate bookings
-if (!data.bookings || data.bookings.length === 0) {
-  bookingsList.innerHTML = '<div class="no-bookings-message">No active bookings</div>';
-  attachRefreshListener(container);
-  return;
-}
+    // Populate bookings
+    if (!data.bookings || data.bookings.length === 0) {
+      bookingsList.innerHTML = '<div class="no-bookings-message">No active bookings</div>';
+      attachRefreshListener(container);
+      return;
+    }
 
-// Cache bookings for filtering
-window.cachedBookings = data.bookings;
+    // Cache bookings for filtering
+    window.cachedBookings = data.bookings;
 
-// Initial render with filtering
-filterAndRenderBookings(data.bookings);
+    // Initial render with filtering
+    filterAndRenderBookings(data.bookings);
 
-// Setup filter listeners
-setupFilterListeners();
+    // Setup filter listeners
+    setupFilterListeners();
 
-// Attach refresh listener (balance listeners are attached in renderFilteredBookings)
-attachRefreshListener(container);
+    // Attach refresh listener (balance listeners are attached in renderFilteredBookings)
+    attachRefreshListener(container);
 
-// Auto-open if there are bookings
-if (bookingsCount > 0) {
-  bookingsContent.classList.add('open');
-  toggleIcon.classList.add('open');
-}
+    // Auto-open if there are bookings
+    if (bookingsCount > 0) {
+      bookingsContent.classList.add('open');
+      toggleIcon.classList.add('open');
+    }
 
   } catch (err) {
     console.error("Failed to load bookings:", err);
@@ -463,29 +680,29 @@ if (bookingsCount > 0) {
 function filterAndRenderBookings(bookings) {
   const searchQuery = document.getElementById('bookingSearch')?.value.toLowerCase() || '';
   const statusFilter = document.getElementById('statusFilter')?.value || 'all';
-  
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   // Split into upcoming and previous
   const upcoming = [];
   const previous = [];
-  
+
   bookings.forEach(b => {
     const startDate = new Date(b.startDate);
     startDate.setHours(0, 0, 0, 0);
-    
+
     if (startDate >= today) {
       upcoming.push(b);
     } else {
       previous.push(b);
     }
   });
-  
+
   // Apply filters to both groups
   const filteredUpcoming = applyFilters(upcoming, searchQuery, statusFilter, today);
   const filteredPrevious = applyFilters(previous, searchQuery, statusFilter, today);
-  
+
   renderFilteredBookings(filteredUpcoming, filteredPrevious);
 }
 
@@ -494,22 +711,22 @@ function applyFilters(bookings, searchQuery, statusFilter, today) {
     // Search filter
     const unitName = (b.unitId?.name || '').toLowerCase();
     const unitLabel = (b.unitId?.label || '').toLowerCase();
-    const matchesSearch = !searchQuery || 
-                         unitName.includes(searchQuery) || 
-                         unitLabel.includes(searchQuery);
-    
+    const matchesSearch = !searchQuery ||
+      unitName.includes(searchQuery) ||
+      unitLabel.includes(searchQuery);
+
     if (!matchesSearch) return false;
-    
+
     // Status filter
     if (statusFilter === 'all') return true;
-    
+
     const depositPaid = b.depositPaid === true;
     const balancePaid = b.balancePaid === true;
     const isCancelled = b.paymentStatus === 'cancelled' || b.status === 'cancelled';
-    
+
     const checkInDate = new Date(b.startDate);
     checkInDate.setHours(0, 0, 0, 0);
-    
+
     switch (statusFilter) {
       case 'deposit-paid':
         return depositPaid && !balancePaid;
@@ -528,16 +745,16 @@ function applyFilters(bookings, searchQuery, statusFilter, today) {
 function renderFilteredBookings(upcomingBookings, previousBookings) {
   const bookingsList = document.getElementById('bookingsList');
   if (!bookingsList) return;
-  
+
   bookingsList.innerHTML = '';
-  
+
   const totalResults = upcomingBookings.length + previousBookings.length;
-  
+
   if (totalResults === 0) {
     bookingsList.innerHTML = '<div class="no-bookings-message">No matching bookings found</div>';
     return;
   }
-  
+
   // Render upcoming bookings
   if (upcomingBookings.length > 0) {
     const upcomingSection = document.createElement('div');
@@ -548,14 +765,14 @@ function renderFilteredBookings(upcomingBookings, previousBookings) {
         <span class="booking-group-count">${upcomingBookings.length}</span>
       </div>
     `;
-    
+
     upcomingBookings.forEach(b => {
       upcomingSection.appendChild(createBookingCard(b));
     });
-    
+
     bookingsList.appendChild(upcomingSection);
   }
-  
+
   // Render previous bookings
   if (previousBookings.length > 0) {
     const previousSection = document.createElement('div');
@@ -566,14 +783,14 @@ function renderFilteredBookings(upcomingBookings, previousBookings) {
         <span class="booking-group-count">${previousBookings.length}</span>
       </div>
     `;
-    
+
     previousBookings.forEach(b => {
       previousSection.appendChild(createBookingCard(b));
     });
-    
+
     bookingsList.appendChild(previousSection);
   }
-  
+
   // Reattach event listeners
   attachBalancePaymentListeners(bookingsList.parentElement);
 }
@@ -581,23 +798,23 @@ function renderFilteredBookings(upcomingBookings, previousBookings) {
 function createBookingCard(b) {
   const div = document.createElement('div');
   div.className = 'border rounded p-2 mb-2';
-  
+
   const start = new Date(b.startDate);
   const end = new Date(b.endDate);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
-  
+
   const isPast = end < today;
   const checkInDate = new Date(start);
   checkInDate.setHours(0, 0, 0, 0);
-  
+
   const depositPaid = b.depositPaid === true;
   const balancePaid = b.balancePaid === true;
-  
+
   let statusLabel = '';
   let actionHTML = '';
-  
+
   if (b.paymentStatus === 'cancelled') {
     statusLabel = '<span class="badge bg-secondary">Cancelled</span>';
   } else if (isPast) {
@@ -606,13 +823,13 @@ function createBookingCard(b) {
     statusLabel = '<span class="badge bg-warning">Payment Pending</span>';
   } else if (depositPaid && !balancePaid) {
     statusLabel = '<span class="badge bg-info">Deposit Paid</span>';
-    
+
     const balanceAmount = (b.fullAmount || b.totalPrice || 0) - FIXED_DEPOSIT;
     const paymentMethod = b.paymentMethod || 'crypto';
-    const paymentMethodLabel = paymentMethod === 'mpesa' ? 'M-Pesa' 
-  : (paymentMethod === 'visa' || paymentMethod === 'paystack') ? 'Paystack'
-  : 'Crypto';
-    
+    const paymentMethodLabel = paymentMethod === 'mpesa' ? 'M-Pesa'
+      : (paymentMethod === 'visa' || paymentMethod === 'paystack') ? 'Paystack'
+        : 'Crypto';
+
     actionHTML = `
       <button class="btn btn-sm btn-success pay-balance-btn mt-1"
               data-booking-id="${b.bookingId}"
@@ -623,9 +840,9 @@ function createBookingCard(b) {
         Pay Balance via ${paymentMethodLabel} (KES ${balanceAmount.toFixed(2)})
       </button>
     `;
-    
+
     const daysUntil = Math.ceil((checkInDate - today) / (1000 * 60 * 60 * 24));
-    
+
     if (daysUntil > 0) {
       actionHTML += `<small class="text-muted d-block mt-1">Balance due in ${daysUntil} day(s)</small>`;
     } else if (daysUntil === 0) {
@@ -633,13 +850,13 @@ function createBookingCard(b) {
     } else {
       actionHTML += `<small class="text-danger d-block mt-1"><strong>Balance overdue by ${Math.abs(daysUntil)} day(s)</strong></small>`;
     }
-    
+
     actionHTML += `<button class="btn btn-sm btn-outline-danger cancel-btn mt-1 ms-1" data-id="${b._id}">Cancel</button>`;
   } else {
     statusLabel = '<span class="badge bg-success">Fully Paid</span>';
     actionHTML = `<button class="btn btn-sm btn-outline-danger cancel-btn mt-1" data-id="${b._id}">Cancel</button>`;
   }
-  
+
   div.innerHTML = `
     <strong>${b.unitId?.name || 'Rental'}</strong><br>
     <small>Check-in: ${start.toLocaleDateString()}</small><br>
@@ -649,26 +866,26 @@ function createBookingCard(b) {
     <small>Method: ${b.paymentMethod || 'N/A'}</small><br>
     Status: ${statusLabel}<br>${actionHTML}
   `;
-  
+
   const cancelBtn = div.querySelector('.cancel-btn');
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => cancelBooking(b._id));
   }
-  
+
   return div;
 }
 
 function setupFilterListeners() {
   const searchInput = document.getElementById('bookingSearch');
   const statusFilter = document.getElementById('statusFilter');
-  
+
   if (searchInput) {
     searchInput.addEventListener('input', () => {
       const allBookings = window.cachedBookings || [];
       filterAndRenderBookings(allBookings);
     });
   }
-  
+
   if (statusFilter) {
     statusFilter.addEventListener('change', () => {
       const allBookings = window.cachedBookings || [];
@@ -734,7 +951,7 @@ function validateBookingDates(start, end, existingBookings = []) {
 
   const minStart = new Date(now);
   minStart.setDate(minStart.getDate() + 1);
-  
+
   if (startDate < minStart) {
     return { valid: false, error: 'Bookings must start at least 24 hours from now' };
   }
@@ -752,24 +969,24 @@ function validateBookingDates(start, end, existingBookings = []) {
   for (const booked of existingBookings) {
     // Only check bookings that have at least deposit paid
     if (!booked.depositPaid && booked.paymentStatus !== 'confirmed') continue;
-    
+
     let bookedStart = new Date(booked.startDate);
     let bookedEnd = new Date(booked.endDate);
-    
+
     bookedStart.setHours(0, 0, 0, 0);
     bookedEnd.setHours(0, 0, 0, 0);
 
-// ✅ REPLACE WITH CLEAR LOGIC:
-// Check if dates overlap (standard overlap check)
-const hasOverlap = startDate < bookedEnd && endDate > bookedStart;
+    // ✅ REPLACE WITH CLEAR LOGIC:
+    // Check if dates overlap (standard overlap check)
+    const hasOverlap = startDate < bookedEnd && endDate > bookedStart;
 
-// Check if it's a back-to-back booking (checkout = checkin)
-const isBackToBack = startDate.getTime() === bookedEnd.getTime();
+    // Check if it's a back-to-back booking (checkout = checkin)
+    const isBackToBack = startDate.getTime() === bookedEnd.getTime();
 
-// Only reject if there's an overlap AND it's NOT a back-to-back booking
-if (hasOverlap && !isBackToBack) {
-  return { valid: false, error: 'Selected dates conflict with an existing booking' };
-}
+    // Only reject if there's an overlap AND it's NOT a back-to-back booking
+    if (hasOverlap && !isBackToBack) {
+      return { valid: false, error: 'Selected dates conflict with an existing booking' };
+    }
   }
 
   return { valid: true, nights };
@@ -783,29 +1000,29 @@ async function handleCryptoPayment(bookingData, totalPrice) {
     showStatus('Please connect your wallet first', 'error');
     return null;
   }
-  
+
   const now = Date.now();
   const timeSinceLastTx = now - lastTransactionTime;
-  
+
   if (timeSinceLastTx < TRANSACTION_COOLDOWN) {
     const waitTime = Math.ceil((TRANSACTION_COOLDOWN - timeSinceLastTx) / 1000);
     showStatus(`Please wait ${waitTime} seconds before next transaction`, 'error');
     return null;
   }
-  
+
   try {
     showStatus('Checking network and balance...', 'info');
     const isCorrectNetwork = await verifyCorrectNetwork(80002);
-if (!isCorrectNetwork) {
-  showStatus('Please switch to Polygon Amoy Testnet (Chain ID: 80002)', 'error');
-  const switched = await switchNetwork('POLYGON_AMOY');
-  if (!switched) {
-    return null;
-  }
-  // Reload page after network switch
-  window.location.reload();
-  return null;
-}
+    if (!isCorrectNetwork) {
+      showStatus('Please switch to Polygon Amoy Testnet (Chain ID: 80002)', 'error');
+      const switched = await switchNetwork('POLYGON_AMOY');
+      if (!switched) {
+        return null;
+      }
+      // Reload page after network switch
+      window.location.reload();
+      return null;
+    }
 
     const networkInfo = await getNetworkInfo();
     console.log('Network:', networkInfo);
@@ -821,61 +1038,61 @@ if (!isCorrectNetwork) {
     let balanceTxHash = null;
 
     // ✅ BRANCH BASED ON PAYMENT TYPE
-if (paymentState.paymentType === 'FULL') {
-  showStatus('Processing full payment (this may take a moment)...', 'info');
+    if (paymentState.paymentType === 'FULL') {
+      showStatus('Processing full payment (this may take a moment)...', 'info');
 
-  // 1️⃣ Pay deposit first
-  showStatus('Step 1/2: Processing deposit...', 'info');
-  depositTxHash = await payDeposit(
-    bookingData.bookingId,
-    paymentState.depositAmount
-  );
+      // 1️⃣ Pay deposit first
+      showStatus('Step 1/2: Processing deposit...', 'info');
+      depositTxHash = await payDeposit(
+        bookingData.bookingId,
+        paymentState.depositAmount
+      );
 
-  if (!depositTxHash) {
-    showStatus('Deposit payment canceled', 'error');
-    return null;
-  }
-
-  console.log('✅ Deposit TX Hash:', depositTxHash);
-  showStatus('Deposit confirmed! Processing balance...', 'success');
-  
-  // Wait for deposit to fully confirm and network state to update
-  await new Promise(resolve => setTimeout(resolve, 8000));
-
-  // 2️⃣ Pay balance if there is one
-  if (paymentState.balanceAmount > 0) {
-    showStatus('Step 2/2: Processing balance payment...', 'info');
-    
-    balanceTxHash = await payBalance(
-      bookingData.bookingId,
-      paymentState.balanceAmount,
-      false // Do NOT skip on-chain check for crypto payments
-    );
-
-    if (!balanceTxHash) {
-      showStatus('Balance payment canceled. Deposit was successful.', 'error');
-      // Still return success for deposit - user can pay balance later
-      lastTransactionTime = Date.now();
-      return null;
-    }
-    
-    console.log('✅ Balance TX Hash:', balanceTxHash);
-  }
-
-  lastTransactionTime = Date.now();
-  showStatus('Full payment confirmed! Booking complete.', 'success');
-}
- else {
-      // ✅ Pay deposit only (two-phase)
-      showStatus('Processing deposit payment...', 'info');
-      
-      depositTxHash = await payDeposit(bookingData.bookingId, paymentState.depositAmount);
-      
       if (!depositTxHash) {
         showStatus('Deposit payment canceled', 'error');
         return null;
       }
-      
+
+      console.log('✅ Deposit TX Hash:', depositTxHash);
+      showStatus('Deposit confirmed! Processing balance...', 'success');
+
+      // Wait for deposit to fully confirm and network state to update
+      await new Promise(resolve => setTimeout(resolve, 8000));
+
+      // 2️⃣ Pay balance if there is one
+      if (paymentState.balanceAmount > 0) {
+        showStatus('Step 2/2: Processing balance payment...', 'info');
+
+        balanceTxHash = await payBalance(
+          bookingData.bookingId,
+          paymentState.balanceAmount,
+          false // Do NOT skip on-chain check for crypto payments
+        );
+
+        if (!balanceTxHash) {
+          showStatus('Balance payment canceled. Deposit was successful.', 'error');
+          // Still return success for deposit - user can pay balance later
+          lastTransactionTime = Date.now();
+          return null;
+        }
+
+        console.log('✅ Balance TX Hash:', balanceTxHash);
+      }
+
+      lastTransactionTime = Date.now();
+      showStatus('Full payment confirmed! Booking complete.', 'success');
+    }
+    else {
+      // ✅ Pay deposit only (two-phase)
+      showStatus('Processing deposit payment...', 'info');
+
+      depositTxHash = await payDeposit(bookingData.bookingId, paymentState.depositAmount);
+
+      if (!depositTxHash) {
+        showStatus('Deposit payment canceled', 'error');
+        return null;
+      }
+
       console.log('Deposit TX Hash:', depositTxHash);
       lastTransactionTime = Date.now();
       showStatus(`Deposit confirmed! Balance of KES ${paymentState.balanceAmount.toFixed(2)} due at check-in.`, 'success');
@@ -977,7 +1194,7 @@ async function handleCryptoBalancePayment(bookingId, unitId, balanceAmount, gues
 
     // ✅ Pay balance on-chain (WITH on-chain verification)
     const balanceTxHash = await payBalance(bookingId, balanceAmount, false); // skipOnChainCheck = false
-    
+
     if (!balanceTxHash) {
       showStatus("Balance payment cancelled", "error");
       return false;
@@ -1047,7 +1264,7 @@ async function handleMpesaBalancePayment(bookingId, unitId, balanceAmount, guest
     });
 
     const data = await res.json();
-    
+
     console.log("📥 Balance payment response:", data);
 
     if (!res.ok) {
@@ -1059,7 +1276,7 @@ async function handleMpesaBalancePayment(bookingId, unitId, balanceAmount, guest
     // ✅ Poll for balance payment confirmation
     const balanceBookingId = data.bookingId;
     const result = await pollMpesaBalancePaymentStatus(bookingId, balanceBookingId);
-    
+
     return result;
 
   } catch (err) {
@@ -1072,8 +1289,8 @@ async function handlePaystackBalancePayment(bookingId, unitId, balanceAmount, gu
   try {
     showStatus("Initializing Paystack balance payment...", "info");
 
-    const email = document.getElementById("guestEmail")?.value || 
-                  `user${Date.now()}@alina906vibes.com`;
+    const email = document.getElementById("guestEmail")?.value ||
+      `user${Date.now()}@alina906vibes.com`;
 
     const res = await fetch(`${API_BASE}/api/payments/paystack/init`, {
       method: "POST",
@@ -1090,16 +1307,16 @@ async function handlePaystackBalancePayment(bookingId, unitId, balanceAmount, gu
     });
 
     const data = await res.json();
-    
+
     if (!res.ok) {
       throw new Error(data.error || "Failed to initialize balance payment");
     }
 
     showStatus("Redirecting to Paystack for balance payment...", "success");
-    
+
     // Redirect to Paystack
     window.location.href = data.authorization_url;
-    
+
     return true;
 
   } catch (err) {
@@ -1134,13 +1351,13 @@ async function pollMpesaBalancePaymentStatus(originalBookingId, balanceBookingId
       );
 
       const statusJson = await statusRes.json();
-      
+
       console.log(`🔍 Poll attempt ${attempts}:`, statusJson);
 
       // ✅ Check for confirmed balance payment
       if (statusJson.success && statusJson.booking) {
         const booking = statusJson.booking;
-        
+
         // Balance payment confirmed
         if (booking.balancePaid === true || booking.paymentStatus === "confirmed") {
           console.log(" Balance payment confirmed!");
@@ -1151,7 +1368,7 @@ async function pollMpesaBalancePaymentStatus(originalBookingId, balanceBookingId
 
       // Check for failure states
       const pendingBooking = statusJson.booking;
-      
+
       if (pendingBooking?.status === "cancelled") {
         showStatus("M-Pesa balance payment cancelled", "error");
         return null;
@@ -1219,7 +1436,7 @@ async function handleMpesaPayment(bookingData) {
     // ✅ Poll for payment confirmation
     const bookingId = data.bookingId;
     const result = await pollMpesaPaymentStatus(bookingId);
-    
+
     return result;
 
   } catch (err) {
@@ -1280,8 +1497,8 @@ async function handlePaystackPayment(bookingData) {
   try {
     showStatus("Initializing Paystack payment...", "info");
 
-    const email = document.getElementById("guestEmail")?.value || 
-                  `user${Date.now()}@alina906vibes.com`;
+    const email = document.getElementById("guestEmail")?.value ||
+      `user${Date.now()}@alina906vibes.com`;
 
     // ✅ FIXED: Send all required fields for booking creation
     const res = await fetch(`${API_BASE}/api/payments/paystack/init`, {
@@ -1295,7 +1512,7 @@ async function handlePaystackPayment(bookingData) {
         amount: paymentState.amountToPayNow,
         type: 'deposit', // Always deposit on first payment
         email: email,
-        
+
         // ✅ NEW: Include booking details for creation
         unitId: bookingData.unitId,
         startDate: bookingData.startDate,
@@ -1306,26 +1523,26 @@ async function handlePaystackPayment(bookingData) {
     });
 
     const data = await res.json();
-    
+
     if (!res.ok) {
       throw new Error(data.error || "Failed to initialize Paystack payment");
     }
 
-showStatus("Redirecting to Paystack checkout...", "success");
+    showStatus("Redirecting to Paystack checkout...", "success");
 
-// ✅ Store bookingId in localStorage before redirect
-localStorage.setItem('pendingPaystackBooking', JSON.stringify({
-  bookingId: bookingData.bookingId,
-  unitId: bookingData.unitId,
-  timestamp: Date.now()
-}));
+    // ✅ Store bookingId in localStorage before redirect
+    localStorage.setItem('pendingPaystackBooking', JSON.stringify({
+      bookingId: bookingData.bookingId,
+      unitId: bookingData.unitId,
+      timestamp: Date.now()
+    }));
 
-console.log('💾 Stored pending booking:', bookingData.bookingId);
+    console.log('💾 Stored pending booking:', bookingData.bookingId);
 
-// Redirect to Paystack checkout
-window.location.href = data.authorization_url;
+    // Redirect to Paystack checkout
+    window.location.href = data.authorization_url;
 
-return { pending: true, reference: data.reference };
+    return { pending: true, reference: data.reference };
 
   } catch (err) {
     console.error("Paystack error:", err);
@@ -1369,15 +1586,15 @@ async function createBooking() {
     nights: paymentState.nights
   });
   const guestPhoneInput = document.getElementById('guestPhone')?.value;
-if (!guestPhoneInput) {
-  showStatus('Please enter guest phone number', 'error');
-  showLoading(false);
-  if (bookBtn) {
-    bookBtn.disabled = false;
-    bookBtn.textContent = `Pay KES ${paymentState.amountToPayNow.toFixed(2)}`;
+  if (!guestPhoneInput) {
+    showStatus('Please enter guest phone number', 'error');
+    showLoading(false);
+    if (bookBtn) {
+      bookBtn.disabled = false;
+      bookBtn.textContent = `Pay KES ${paymentState.amountToPayNow.toFixed(2)}`;
+    }
+    return;
   }
-  return;
-}
 
   const bookBtn = document.getElementById('bookBtn');
   if (bookBtn) {
@@ -1401,12 +1618,12 @@ if (!guestPhoneInput) {
 
     showStatus('Processing booking...', 'info');
 
-const startDateISO = new Date(startDate).toISOString();
-const endDateISO = new Date(endDate).toISOString();
+    const startDateISO = new Date(startDate).toISOString();
+    const endDateISO = new Date(endDate).toISOString();
 
-const walletAddr = getWalletAddress();
-const walletSuffix = walletAddr ? walletAddr.slice(2, 8) : 'offchain';
-const bookingId = `booking_${Date.now()}_${unitIdFromUrl}_${walletSuffix}_${Math.random().toString(36).slice(2, 10)}`;    const bookingData = {
+    const walletAddr = getWalletAddress();
+    const walletSuffix = walletAddr ? walletAddr.slice(2, 8) : 'offchain';
+    const bookingId = `booking_${Date.now()}_${unitIdFromUrl}_${walletSuffix}_${Math.random().toString(36).slice(2, 10)}`; const bookingData = {
       bookingId,
       unitId: unitIdFromUrl,
       startDate: startDateISO,
@@ -1422,52 +1639,52 @@ const bookingId = `booking_${Date.now()}_${unitIdFromUrl}_${walletSuffix}_${Math
 
     console.log('📅 Booking data:', bookingData);
 
-// Around line 1050, in the payment routing section:
-let result;
+    // Around line 1050, in the payment routing section:
+    let result;
 
-// ✅ Route to appropriate payment handler
-if (paymentMethod === 'crypto') {
-  result = await handleCryptoPayment(bookingData, paymentState.amountToPayNow);
-} else if (paymentMethod === 'mpesa') {
-  result = await handleMpesaPayment(bookingData);
-} else if (paymentMethod === 'visa' || paymentMethod === 'paystack') { // ADD THIS
-  result = await handlePaystackPayment(bookingData);
-} else {
-  showStatus('Payment method not yet implemented', 'error');
-  return;
-}
+    // ✅ Route to appropriate payment handler
+    if (paymentMethod === 'crypto') {
+      result = await handleCryptoPayment(bookingData, paymentState.amountToPayNow);
+    } else if (paymentMethod === 'mpesa') {
+      result = await handleMpesaPayment(bookingData);
+    } else if (paymentMethod === 'visa' || paymentMethod === 'paystack') { // ADD THIS
+      result = await handlePaystackPayment(bookingData);
+    } else {
+      showStatus('Payment method not yet implemented', 'error');
+      return;
+    }
 
-// MODIFY the success handling for Paystack redirects:
-if (result && (result.success || result.pending)) {
-if (result.pending || result.authorization_url) {
-  showStatus('Redirecting to Paystack...', 'info');
-  
-  // ✅ Use the callback URL from backend (already has real reference)
-  const callbackUrl = result.callbackUrl || 
-    `${window.location.origin}/booking.html?id=${unitIdFromUrl}&bookingId=${bookingData.bookingId}`;
-  
-  // ✅ Paystack will add their reference automatically
-  const paystackUrl = result.authorization_url;
-  
-console.log("🔗 Redirecting to Paystack");
-  console.log("📝 Booking ID for callback:", bookingData.bookingId);
-  
-  // ✅ Paystack will handle the redirect back with their reference
-  setTimeout(() => {
-    window.location.href = paystackUrl;
-  }, 1000);
-  
-  return;
-}
-  
-  showStatus(' Booking confirmed!', 'success');
-  
-  // Clear form... (rest of existing code)
-      
+    // MODIFY the success handling for Paystack redirects:
+    if (result && (result.success || result.pending)) {
+      if (result.pending || result.authorization_url) {
+        showStatus('Redirecting to Paystack...', 'info');
+
+        // ✅ Use the callback URL from backend (already has real reference)
+        const callbackUrl = result.callbackUrl ||
+          `${window.location.origin}/booking.html?id=${unitIdFromUrl}&bookingId=${bookingData.bookingId}`;
+
+        // ✅ Paystack will add their reference automatically
+        const paystackUrl = result.authorization_url;
+
+        console.log("🔗 Redirecting to Paystack");
+        console.log("📝 Booking ID for callback:", bookingData.bookingId);
+
+        // ✅ Paystack will handle the redirect back with their reference
+        setTimeout(() => {
+          window.location.href = paystackUrl;
+        }, 1000);
+
+        return;
+      }
+
+      showStatus(' Booking confirmed!', 'success');
+
+      // Clear form... (rest of existing code)
+
       // Clear form
       document.getElementById('startDate').value = '';
       document.getElementById('endDate').value = '';
-      
+
       // Reset payment state
       paymentState = {
         fullAmount: 0,
@@ -1478,7 +1695,7 @@ console.log("🔗 Redirecting to Paystack");
         nights: 0
       };
       updatePaymentUI();
-      
+
       // Refresh UI
       await loadCalendar();
       await loadUserBookings();
@@ -1502,7 +1719,7 @@ console.log("🔗 Redirecting to Paystack");
 // ===============================
 function normalizePhoneNumber(phone) {
   phone = phone.trim();
-  
+
   if (!phone.startsWith('+')) {
     if (phone.startsWith('254')) {
       phone = '+' + phone;
@@ -1512,7 +1729,7 @@ function normalizePhoneNumber(phone) {
       phone = '+254' + phone;
     }
   }
-  
+
   return phone;
 }
 
@@ -1528,7 +1745,7 @@ function setupMonthNavigation() {
     }
     loadCalendar();
   });
-  
+
   document.getElementById('nextMonth')?.addEventListener('click', () => {
     currentMonth++;
     if (currentMonth > 11) {
@@ -1546,10 +1763,10 @@ function setupAuthUI() {
   const loginBtn = document.getElementById('loginLink');
   const signupBtn = document.getElementById('signupLink');
   const logoutBtn = document.getElementById('logoutBtn');
-  
+
   // ✅ Use better token check
   const isLoggedIn = isUserLoggedIn();
-  
+
   if (isLoggedIn) {
     loginBtn?.style && (loginBtn.style.display = 'none');
     signupBtn?.style && (signupBtn.style.display = 'none');
@@ -1557,7 +1774,7 @@ function setupAuthUI() {
   } else {
     logoutBtn?.style && (logoutBtn.style.display = 'none');
   }
-  
+
   logoutBtn?.addEventListener('click', () => {
     if (confirm('Are you sure you want to logout?')) {
       localStorage.removeItem(TOKEN_KEY);
@@ -1571,8 +1788,8 @@ function setupAuthUI() {
 }
 
 async function setupWalletConnection() {
-  const connectBtn    = document.getElementById('connectWallet');
-  const walletStatus  = document.getElementById('walletAddress');
+  const connectBtn = document.getElementById('connectWallet');
+  const walletStatus = document.getElementById('walletAddress');
   const walletInfoRow = document.getElementById('walletInfoRow');
   const disconnectBtn = document.getElementById('disconnectWallet');
 
@@ -1584,13 +1801,15 @@ async function setupWalletConnection() {
   if (savedAddr) {
     connectBtn.style.display = 'none';
     if (walletInfoRow) walletInfoRow.style.display = 'flex';
-    if (walletStatus)  walletStatus.textContent = `${savedAddr.slice(0, 6)}...${savedAddr.slice(-4)}`;
+    if (walletStatus) walletStatus.textContent = `${savedAddr.slice(0, 6)}...${savedAddr.slice(-4)}`;
   }
 
   // Connect
   connectBtn.addEventListener('click', async () => {
     connectBtn.disabled = true;
-    connectBtn.querySelector('.wallet-btn-text').textContent = 'Connecting...';
+    const btnTextEl = connectBtn.querySelector('.wallet-btn-text');
+    if (btnTextEl) btnTextEl.textContent = 'Connecting...';
+    else connectBtn.textContent = '🦊 Connecting…';
 
     const addr = await connectWallet();
 
@@ -1599,14 +1818,16 @@ async function setupWalletConnection() {
 
       connectBtn.style.display = 'none';
       if (walletInfoRow) walletInfoRow.style.display = 'flex';
-      if (walletStatus)  walletStatus.textContent = `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+      if (walletStatus) walletStatus.textContent = `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
       showStatus('Wallet connected successfully', 'success');
       window.updateNav?.();
     } else {
       // Reset button if connection failed
       connectBtn.disabled = false;
-      connectBtn.querySelector('.wallet-btn-text').textContent = 'Connect Wallet';
+      const resetTextEl = connectBtn.querySelector('.wallet-btn-text');
+      if (resetTextEl) resetTextEl.textContent = 'Connect Wallet';
+      else connectBtn.innerHTML = '<span>🦊</span> Connect Wallet';
     }
   });
 
@@ -1618,9 +1839,11 @@ async function setupWalletConnection() {
 
       connectBtn.style.display = '';
       connectBtn.disabled = false;
-      connectBtn.querySelector('.wallet-btn-text').textContent = 'Connect Wallet';
+      const dcTextEl = connectBtn.querySelector('.wallet-btn-text');
+      if (dcTextEl) dcTextEl.textContent = 'Connect Wallet';
+      else connectBtn.innerHTML = '<span>🦊</span> Connect Wallet';
       if (walletInfoRow) walletInfoRow.style.display = 'none';
-      if (walletStatus)  walletStatus.textContent = '—';
+      if (walletStatus) walletStatus.textContent = '—';
 
       showStatus('Wallet disconnected', 'info');
       window.updateNav?.();
@@ -1630,19 +1853,19 @@ async function setupWalletConnection() {
 
 async function loadRentalDetails() {
   if (!unitId) return;
-  
+
   try {
     const res = await fetch(`${API_BASE}/units/${unitId}`);
     const unit = await res.json();
-    
+
     const titleEl = document.getElementById('rentalTitle');
     const descEl = document.getElementById('rentalDescription');
     const priceEl = document.getElementById('unitPrice');
-    
+
     if (titleEl) titleEl.textContent = unit.name;
     if (descEl) descEl.textContent = unit.description;
     if (priceEl) priceEl.textContent = `KES ${unit.pricePerNight}/night`;
-    
+
   } catch (err) {
     console.error('Failed to load rental:', err);
     showStatus('Failed to load rental details', 'error');
@@ -1655,64 +1878,64 @@ async function loadRentalDetails() {
 document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   unitId = urlParams.get('id');
-  
+
   if (!unitId) {
     console.error('❌ No unit ID in URL');
     showStatus('Invalid booking page URL', 'error');
     return;
   }
-  
+
   // Setup UI
   setupAuthUI();
   setupMonthNavigation();
   await setupWalletConnection();
-  
+
   // ✅ Setup two-phase payment listeners
   setupPaymentTypeListeners();
   setupDateChangeListeners();
   updatePaymentUI();
-  
+
   // Load data
   await loadRentalDetails();
   await loadCalendar();
   await loadUserBookings();
-  
+
   // Attach booking button
   const bookBtn = document.getElementById('bookBtn');
   if (bookBtn) {
     bookBtn.addEventListener('click', createBooking);
   }
- const savedCallback = localStorage.getItem('paystackCallback');
-if (savedCallback) {
-  try {
-    const { reference, bookingId } = JSON.parse(savedCallback);
-    const unitIdFromUrl = new URLSearchParams(window.location.search).get('id');
-    const newUrl = window.location.pathname + `?id=${unitIdFromUrl}&reference=${reference}&bookingId=${bookingId}`;
-    window.history.replaceState({}, '', newUrl);
+  const savedCallback = localStorage.getItem('paystackCallback');
+  if (savedCallback) {
+    try {
+      const { reference, bookingId } = JSON.parse(savedCallback);
+      const unitIdFromUrl = new URLSearchParams(window.location.search).get('id');
+      const newUrl = window.location.pathname + `?id=${unitIdFromUrl}&reference=${reference}&bookingId=${bookingId}`;
+      window.history.replaceState({}, '', newUrl);
+      await checkPaystackCallback();
+    } catch (err) {
+      console.error('Failed to process saved callback:', err);
+      localStorage.removeItem('paystackCallback');
+    }
+  } else {
     await checkPaystackCallback();
-  } catch (err) {
-    console.error('Failed to process saved callback:', err);
-    localStorage.removeItem('paystackCallback');
   }
-} else {
-  await checkPaystackCallback();
-}
 });
 async function checkPaystackCallback() {
   const urlParams = new URLSearchParams(window.location.search);
   const bookingId = urlParams.get('bookingId');
   const trxref = urlParams.get('trxref'); // ✅ Paystack uses 'trxref' in callback
   const reference = urlParams.get('reference') || trxref; // ✅ Fallback
-  
+
   // ✅ Only need bookingId to poll - reference is just for logging
-if (!bookingId) {
+  if (!bookingId) {
     const pending = localStorage.getItem('pendingPaystackBooking');
     if (pending) {
       try {
         const data = JSON.parse(pending);
         bookingId = data.bookingId;
         console.log('📦 Retrieved bookingId from localStorage:', bookingId);
-        
+
         // Clear old pending bookings (>10 minutes)
         if (Date.now() - data.timestamp > 10 * 60 * 1000) {
           localStorage.removeItem('pendingPaystackBooking');
@@ -1728,119 +1951,119 @@ if (!bookingId) {
       return;
     }
   }
-  
-console.log('📥 Paystack callback detected:', { 
-  reference: reference || 'none', 
-  bookingId: bookingId || 'MISSING',
-  fullURL: window.location.href 
-});
-  
+
+  console.log('📥 Paystack callback detected:', {
+    reference: reference || 'none',
+    bookingId: bookingId || 'MISSING',
+    fullURL: window.location.href
+  });
+
   // ✅ Check if user is logged in
   const token = getToken();
   if (!token) {
     console.warn('⚠️ User not logged in after Paystack redirect');
     showStatus('Payment received! Please log in to view your booking.', 'success');
-    
+
     // Save callback params to localStorage for retry after login
     localStorage.setItem('paystackCallback', JSON.stringify({ reference, bookingId }));
-    
+
     // Clean URL
     const unitIdFromUrl = urlParams.get('id');
     if (unitIdFromUrl) {
       window.history.replaceState({}, '', window.location.pathname + `?id=${unitIdFromUrl}`);
     }
-    
+
     // Redirect to login after 3 seconds
     setTimeout(() => {
       window.location.href = `login.html?redirect=${encodeURIComponent(window.location.pathname + '?id=' + unitIdFromUrl)}`;
     }, 3000);
-    
+
     return;
   }
-  
+
   showStatus('Verifying payment...', 'info');
   showLoading(true);
-  
+
   try {
     // Poll for payment confirmation
     let attempts = 0;
     const maxAttempts = 20;
     let bookingFound = false;
-    
-while (attempts < maxAttempts && !bookingFound) {
+
+    while (attempts < maxAttempts && !bookingFound) {
       await new Promise(r => setTimeout(r, 2000));
       attempts++;
-      
+
       try {
         const statusRes = await fetch(`${API_BASE}/api/book/my`, {
-          headers: { 
+          headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
-        
+
         // ✅ Handle 401 specifically
         if (statusRes.status === 401) {
           console.error('❌ Auth token expired/invalid');
           showStatus('Session expired. Please log in again.', 'error');
-          
+
           // Save callback for retry
           localStorage.setItem('paystackCallback', JSON.stringify({ reference, bookingId }));
-          
+
           const unitIdFromUrl = urlParams.get('id');
           setTimeout(() => {
             localStorage.removeItem(TOKEN_KEY);
             window.location.href = `login.html?redirect=${encodeURIComponent(window.location.pathname + '?id=' + unitIdFromUrl)}`;
           }, 2000);
-          
+
           break;
         }
-        
+
         if (!statusRes.ok) {
           console.warn(`⚠️ Poll attempt ${attempts} failed: HTTP ${statusRes.status}`);
           continue;
         }
-        
-const data = await statusRes.json();
 
-console.log(`📝 Poll attempt ${attempts}:`, {
-  searchingFor: bookingId,
-  foundBookings: data.bookings?.length || 0,
-  bookingIds: data.bookings?.map(b => b.bookingId) || []
-});
+        const data = await statusRes.json();
 
-const booking = data.bookings?.find(b => b.bookingId === bookingId);
+        console.log(`📝 Poll attempt ${attempts}:`, {
+          searchingFor: bookingId,
+          foundBookings: data.bookings?.length || 0,
+          bookingIds: data.bookings?.map(b => b.bookingId) || []
+        });
 
-if (booking) {
-  console.log(` Poll attempt ${attempts}: FOUND booking:`, {
+        const booking = data.bookings?.find(b => b.bookingId === bookingId);
+
+        if (booking) {
+          console.log(` Poll attempt ${attempts}: FOUND booking:`, {
             bookingId: booking.bookingId,
             depositPaid: booking.depositPaid,
             balancePaid: booking.balancePaid,
             paymentStatus: booking.paymentStatus,
             paystackDepositRef: booking.paystackDepositRef || 'none'
           });
-          
+
           // ✅ Check if deposit is paid (webhook sets this)
           if (booking.depositPaid === true) {
             bookingFound = true;
-            
+
             if (booking.balancePaid === true) {
               showStatus(' Full payment confirmed! Booking complete.', 'success');
             } else {
               showStatus(' Deposit confirmed! Booking reserved.', 'success');
             }
-            
+
             // ✅ Refresh UI
             await loadCalendar();
             await loadUserBookings();
-            
+
             // ✅ Clean URL and remove callback from localStorage
-// ✅ Clean URL and remove callback data from localStorage
-localStorage.removeItem('paystackCallback');
-localStorage.removeItem('pendingPaystackBooking'); // ✅ ADD THIS
-const unitIdFromUrl = urlParams.get('id');
-window.history.replaceState({}, '', window.location.pathname + `?id=${unitIdFromUrl}`);
-            
+            // ✅ Clean URL and remove callback data from localStorage
+            localStorage.removeItem('paystackCallback');
+            localStorage.removeItem('pendingPaystackBooking'); // ✅ ADD THIS
+            const unitIdFromUrl = urlParams.get('id');
+            window.history.replaceState({}, '', window.location.pathname + `?id=${unitIdFromUrl}`);
+
             break;
           } else {
             console.log(`⏳ Poll attempt ${attempts}: Payment not yet confirmed`);
@@ -1848,17 +2071,17 @@ window.history.replaceState({}, '', window.location.pathname + `?id=${unitIdFrom
         } else {
           console.log(`⏳ Poll attempt ${attempts}: Booking not found yet`);
         }
-        
+
       } catch (fetchErr) {
         console.warn(`⚠️ Poll attempt ${attempts} failed:`, fetchErr.message);
         continue;
       }
     }
-    
+
     if (!bookingFound) {
       showStatus('Payment verification timeout. Please check your bookings.', 'error');
     }
-    
+
   } catch (err) {
     console.error('Payment verification error:', err);
     showStatus('Could not verify payment. Please check your bookings.', 'error');
@@ -1871,7 +2094,7 @@ window.history.replaceState({}, '', window.location.pathname + `?id=${unitIdFrom
 function isUserLoggedIn() {
   const token = getToken();
   if (!token) return false;
-  
+
   try {
     // Basic JWT validation (check if it has 3 parts)
     const parts = token.split('.');
@@ -1880,17 +2103,17 @@ function isUserLoggedIn() {
       localStorage.removeItem(TOKEN_KEY); // Clear bad token
       return false;
     }
-    
+
     // Decode payload to check expiration
     const payload = JSON.parse(atob(parts[1]));
     const now = Math.floor(Date.now() / 1000);
-    
+
     if (payload.exp && payload.exp < now) {
       console.warn('⚠️ Token expired');
       localStorage.removeItem(TOKEN_KEY);
       return false;
     }
-    
+
     return true;
   } catch (err) {
     console.error('❌ Token validation error:', err);

@@ -1,33 +1,87 @@
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Alina906Vibes — Rentals</title>
 
   <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    crossorigin="anonymous" />
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
-   <link rel="stylesheet" href="css/new.css" />
-
-
-
+  <link rel="stylesheet" href="css/new.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
 </head>
 
 <body>
-  <!-- Header -->
-  <header class="py-3">
-    <div class="container d-flex align-items-center justify-content-between">
-      <div class="brand">Alina906Vibes</div>
-      <nav class="d-flex align-items-center">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a id="loginLink" href="login.html" class="btn btn-outline-success ms-3">Sign In</a>
-        <a id="signupLink" href="signup.html" class="btn btn-success ms-2">Sign Up</a>
-      </nav>
+  <!-- ═══ Premium Navbar ═══ -->
+  <nav id="mainNavbar" class="alina-navbar">
+    <div class="navbar-inner">
+      <a class="navbar-logo" href="index.html">Alina<span>906</span>Vibes</a>
+
+      <ul class="navbar-links">
+        <li><a href="index.html" data-page="index">Home</a></li>
+        <li><a href="about.html" data-page="about">About</a></li>
+        <li><a href="contact.html" data-page="contact">Contact</a></li>
+      </ul>
+
+      <div class="navbar-actions">
+        <a id="loginLink" href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
+        <a id="signupLink" href="signup.html" class="nav-btn nav-btn-solid">Sign Up</a>
+
+        <div class="wallet-area" id="navWalletWrapper">
+          <button id="connectWallet" class="wallet-connect-btn">
+            <span class="wallet-icon">🦊</span> Connect Wallet
+          </button>
+          <div id="walletInfoRow" class="wallet-connected" style="display:none;">
+            <span class="wallet-status-dot"></span>
+            <span id="walletAddress" class="wallet-addr">—</span>
+            <button id="disconnectWallet" class="wallet-disconnect-btn">✕</button>
+          </div>
+        </div>
+
+        <div id="avatarDropdown" class="avatar-area" style="display:none;">
+          <button class="avatar-btn" id="avatarToggle">
+            <span class="avatar-initials" id="avatarInitials">?</span>
+          </button>
+          <div class="avatar-menu" id="avatarMenu">
+            <a href="booking.html" class="avatar-menu-item">📋 My Bookings</a>
+            <a href="#" class="avatar-menu-item">👤 Account</a>
+            <div class="avatar-menu-item kyc-status-item">
+              🛡️ KYC Status <span id="kycBadge" class="kyc-badge">—</span>
+            </div>
+            <hr class="avatar-menu-divider">
+            <button id="logoutBtn" class="avatar-menu-item logout-item">🚪 Log Out</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
     </div>
-  </header>
+  </nav>
+
+  <!-- Mobile full-screen overlay -->
+  <div class="mobile-overlay" id="mobileOverlay">
+    <div class="mobile-overlay-content">
+      <a href="index.html" class="mobile-nav-link" data-page="index">Home</a>
+      <a href="about.html" class="mobile-nav-link" data-page="about">About</a>
+      <a href="contact.html" class="mobile-nav-link" data-page="contact">Contact</a>
+      <hr class="mobile-divider">
+      <div class="mobile-auth" id="mobileAuthArea">
+        <a href="login.html" class="nav-btn nav-btn-outline mobile-btn" id="mobileLoginLink">Sign In</a>
+        <a href="signup.html" class="nav-btn nav-btn-solid mobile-btn" id="mobileSignupLink">Sign Up</a>
+      </div>
+      <div class="mobile-wallet" id="mobileWalletArea">
+        <button id="mobileConnectWallet" class="wallet-connect-btn mobile-wallet-btn">🦊 Connect Wallet</button>
+      </div>
+      <button id="mobileLogoutBtn" class="nav-btn nav-btn-outline mobile-btn" style="display:none;">Log Out</button>
+    </div>
+  </div>
 
   <!-- Hero -->
   <section class="hero">
@@ -49,17 +103,7 @@
 
   <!-- scripts -->
   <script type="module">
-    // index client logic — module so imports would be possible later if needed
     const BACKEND = window.BACKEND_URL || '';
-
-    // hide signup/login if token exists
-    const token = localStorage.getItem("userToken");
-    if (token) {
-      const login = document.getElementById("loginLink");
-      const signup = document.getElementById("signupLink");
-      if (login) login.style.display = "none";
-      if (signup) signup.style.display = "none";
-    }
 
     // safe image src builder
     function imageSrcFromUnit(unit) {
@@ -118,16 +162,16 @@
       return a;
     }
 
-    
+
     async function loadUnits() {
       const container = document.getElementById('unitsContainer');
       const empty = document.getElementById('unitsEmpty');
       try {
-const API_BASE = window.location.hostname === "localhost"
-  ? "http://localhost:5000"
-  : "https://alina906vibes-backend.onrender.com";
+        const API_BASE = window.location.hostname === "localhost"
+          ? "http://localhost:5000"
+          : "https://alina906vibes-backend.onrender.com";
 
-const res = await fetch(`${API_BASE}/units`);
+        const res = await fetch(`${API_BASE}/units`);
         if (!res.ok) throw new Error('units fetch failed ' + res.status);
         const units = await res.json();
         container.innerHTML = '';
@@ -138,10 +182,10 @@ const res = await fetch(`${API_BASE}/units`);
         empty.style.display = 'none';
         units.forEach(u => {
           const card = createCard(u);
-const col = document.createElement('div');
-col.className = 'col-12 col-md-6 col-lg-4 mb-4';
-col.appendChild(card);
-container.appendChild(col);
+          const col = document.createElement('div');
+          col.className = 'col-12 col-md-6 col-lg-4 mb-4';
+          col.appendChild(card);
+          container.appendChild(col);
         });
       } catch (err) {
         console.error('Failed to load units:', err);
@@ -149,12 +193,15 @@ container.appendChild(col);
       }
     }
 
-    
+
     // initialize
     document.addEventListener('DOMContentLoaded', () => {
       loadUnits();
     });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
   <script src="js/nav.js"></script>
 </body>
+
 </html>
