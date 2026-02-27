@@ -8,13 +8,18 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     crossorigin="anonymous" />
-  <link rel="stylesheet" href="css/contact.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/new.css" />
   <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/contact.css" />
+  <link rel="stylesheet" href="css/avatar-dropdown.css" />
 </head>
 
 <body>
-  <!-- ═══ Premium Navbar ═══ -->
+
+  <!-- ═══ Premium Navbar (UNTOUCHED) ═══ -->
   <nav id="mainNavbar" class="alina-navbar">
     <div class="navbar-inner">
       <div class="navbar-row1">
@@ -40,15 +45,18 @@
             </div>
           </div>
           <div id="avatarDropdown" class="avatar-area" style="display:none;">
-            <button class="avatar-btn" id="avatarToggle">
+            <button class="avatar-btn" id="avatarToggle" aria-haspopup="true" aria-expanded="false"
+              aria-label="Account menu">
               <span class="avatar-initials" id="avatarInitials">?</span>
               <span class="avatar-name" id="avatarName">User</span>
+              <!-- JS appends .avatar-caret SVG and .avatar-notif-dot here -->
             </button>
-            <div class="avatar-menu" id="avatarMenu">
+            <div class="avatar-menu" id="avatarMenu" role="menu">
               <a href="my_booking.html" class="avatar-menu-item">📋 My Bookings</a>
-              <a href="#" class="avatar-menu-item">👤 Account</a>
-              <div class="avatar-menu-item kyc-status-item">🛡️ KYC Status <span id="kycBadge"
-                  class="kyc-badge">—</span></div>
+              <a href="dashboard.html" class="avatar-menu-item">👤 Account</a>
+              <div class="avatar-menu-item kyc-status-item">
+                🛡️ KYC Status <span id="kycBadge" class="kyc-badge">—</span>
+              </div>
               <hr class="avatar-menu-divider">
               <button id="logoutBtn" class="avatar-menu-item logout-item">🚪 Log Out</button>
             </div>
@@ -58,122 +66,231 @@
     </div>
   </nav>
 
-  <main class="py-5">
-    <div class="container">
-      <!-- Header -->
-      <section class="text-center mb-5">
-        <h1 class="fw-bold mb-3">Get in Touch</h1>
-        <p class="lead text-muted">
-          Whether you need help with bookings, payments, account verification or partnerships —
-          the Alina906Vibes support team is ready to assist you quickly and professionally.
-        </p>
-      </section>
-      <section class="row text-center mb-5">
-        <div class="col-md-4 mb-4">
-          <div class="p-4 border rounded-4 h-100">
-            <h5 class="fw-bold text-success">Booking Support</h5>
-            <p class="text-muted small">
-              Questions about reservations, confirmations, cancellations or scheduling.
-            </p>
+  <main>
+
+    <!-- ═══ 1. CINEMATIC HERO ═══ -->
+    <section class="ct-hero">
+      <div class="ct-hero-bg"></div>
+      <div class="ct-hero-grid"></div>
+      <div class="ct-hero-orb ct-hero-orb--1"></div>
+      <div class="ct-hero-orb ct-hero-orb--2"></div>
+      <div class="ct-hero-rule"></div>
+
+      <div class="ct-hero-content">
+        <span class="ct-eyebrow">Support · Partnerships · Enquiries</span>
+        <h1>Get in<br><em>touch.</em></h1>
+        <p>Our team is ready to assist you with bookings, payments, account verification or partnerships — quickly and
+          professionally.</p>
+      </div>
+
+      <div class="ct-hero-scroll">
+        <div class="ct-hero-scroll-bar"></div>
+        <span>Scroll</span>
+      </div>
+    </section>
+
+    <!-- ═══ 2. SUPPORT CATEGORIES ═══ -->
+    <section class="ct-categories reveal">
+      <div class="ct-categories-inner">
+
+        <div class="ct-cat-card reveal-stagger">
+          <div class="ct-cat-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
           </div>
+          <span class="ct-cat-label">Booking Support</span>
+          <p>
+            Get help with reservations, booking changes, cancellations, check-in details and general stay inquiries.
+          </p>
         </div>
 
-        <div class="col-md-4 mb-4">
-          <div class="p-4 border rounded-4 h-100">
-            <h5 class="fw-bold text-success">Payments & Transactions</h5>
-            <p class="text-muted small">
-              Assistance with M-Pesa, Visa or Crypto payments and transaction verification.
-            </p>
+        <div class="ct-cat-card reveal-stagger" style="--stagger:0.1s">
+          <div class="ct-cat-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
+          <span class="ct-cat-label">Payments & Transactions</span>
+          <p>
+            Support for M-Pesa, Visa and crypto payments, transaction verification, payment status updates and receipts.
+          </p>
         </div>
 
-        <div class="col-md-4 mb-4">
-          <div class="p-4 border rounded-4 h-100">
-            <h5 class="fw-bold text-success">Account & KYC</h5>
-            <p class="text-muted small">
-              Help with email verification, account setup, identity confirmation or login issues.
-            </p>
+        <div class="ct-cat-card reveal-stagger" style="--stagger:0.2s">
+          <div class="ct-cat-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
           </div>
+          <span class="ct-cat-label">Account & KYC</span>
+          <p>
+            Assistance with account setup, identity verification, login access and profile management.
+          </p>
         </div>
-      </section>
-      <!-- Contact Form and Info -->
-      <section class="row align-items-center">
-        <!-- Left: Contact Info -->
-        <div class="col-md-5 mb-4 mb-md-0">
-          <h3 class="fw-semibold mb-3 text-success">Contact Information</h3>
-          <p>We’d love to hear from you. Reach us through the following channels:</p>
-          <ul class="list-unstyled ms-3 mb-4">
-            <li>📍 Nairobi, Kenya</li>
-            <li>📧 <a href="mailto:support@alina906vibes.com"
-                class="text-success text-decoration-none">support@alina906vibes.com</a></li>
-            <li>📞 +254 700 000 000</li>
+
+      </div>
+    </section>
+    <!-- ═══ 3. CONTACT FORM + INFO ═══ -->
+    <section class="ct-main reveal">
+      <div class="ct-main-inner">
+
+        <!-- Left: info -->
+        <div class="ct-info">
+          <span class="ct-label">Contact Information</span>
+          <h2>Let's start<br><em>a conversation.</em></h2>
+          <p>We'd love to hear from you. Reach us through any of the channels below — our team typically responds within
+            24 hours on weekdays.</p>
+
+          <ul class="ct-info-list">
+            <li>
+              <div class="ct-info-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <span class="ct-info-label">Location</span>
+                <span class="ct-info-value">Nairobi, Kenya</span>
+              </div>
+            </li>
+            <li>
+              <div class="ct-info-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <span class="ct-info-label">Email</span>
+                <a href="mailto:support@alina906vibes.com"
+                  class="ct-info-value ct-info-link">support@alina906vibes.com</a>
+              </div>
+            </li>
+            <li>
+              <div class="ct-info-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              </div>
+              <div>
+                <span class="ct-info-label">Phone</span>
+                <span class="ct-info-value">+254 700 000 000</span>
+              </div>
+            </li>
           </ul>
-          <p class="text-muted">Our team typically responds within 24 hours on weekdays.</p>
-        </div>
 
-        <!-- Right: Form -->
-        <div class="col-md-7">
-          <div class="card shadow-sm rounded-4 border-0">
-            <div class="card-body p-4">
-              <h4 class="fw-semibold mb-4 text-success">Send Us a Message</h4>
-              <form id="contactForm">
-                <div class="mb-3">
-                  <label for="name" class="form-label">Full Name</label>
-                  <input type="text" id="name" class="form-control" placeholder="Your name" required />
-                </div>
-                <div class="mb-3">
-                  <label for="email" class="form-label">Email Address</label>
-                  <input type="email" id="email" class="form-control" placeholder="you@example.com" required />
-                </div>
-                <div class="mb-3">
-                  <label for="message" class="form-label">Message</label>
-                  <textarea id="message" class="form-control" rows="5" placeholder="Write your message here..."
-                    required></textarea>
-                </div>
-                <button type="submit" class="btn btn-success btn-lg w-100">Send Message</button>
-              </form>
+          <!-- Quick links -->
+          <div class="ct-quick">
+            <span class="ct-quick-label">Immediate Assistance</span>
+            <div class="ct-quick-btns">
+              <a href="https://wa.me/254700000000" target="_blank" class="ct-quick-btn ct-quick-btn--primary">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                WhatsApp
+              </a>
+              <a href="https://t.me/yourtelegramusername" target="_blank" class="ct-quick-btn ct-quick-btn--ghost">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+                Telegram
+              </a>
             </div>
           </div>
         </div>
-      </section>
 
-      <!-- Closing Section -->
-      <section class="text-center py-5 bg-light rounded-4 shadow-sm mt-5">
-        <h3 class="fw-semibold mb-3">Need Immediate Assistance?</h3>
-        <p class="mb-4">
-          For faster responses regarding bookings, payment confirmations or account verification,
-          message us directly on WhatsApp or Telegram.
-        </p>
+        <!-- Right: form -->
+        <div class="ct-form-wrap">
+          <span class="ct-label">Send a Message</span>
+          <h2>Write to<br><em>us directly.</em></h2>
 
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-          <a href="https://wa.me/254700000000" target="_blank" class="btn btn-success px-4 py-2">
-            WhatsApp Support
-          </a>
+          <form id="contactForm" class="ct-form">
 
-          <a href="https://t.me/yourtelegramusername" target="_blank" class="btn btn-outline-success px-4 py-2">
-            Telegram Support
-          </a>
+            <div class="ct-field">
+              <label class="ct-field-label" for="name">Full Name</label>
+              <input class="ct-field-input" type="text" id="name" placeholder="Your full name" required />
+            </div>
+
+            <div class="ct-field">
+              <label class="ct-field-label" for="email">Email Address</label>
+              <input class="ct-field-input" type="email" id="email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="ct-field">
+              <label class="ct-field-label" for="message">Message</label>
+              <textarea class="ct-field-input ct-field-textarea" id="message" rows="5"
+                placeholder="Tell us how we can help…" required></textarea>
+            </div>
+
+            <div id="ct-success" class="ct-success-msg" style="display:none;">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Message sent — we'll be in touch within 24 hours.
+            </div>
+
+            <button type="submit" class="ct-submit">Send Message</button>
+
+          </form>
         </div>
-      </section>
-    </div>
-    <section class="text-center mt-5">
-      <p class="small text-muted">
-        Alina906Vibes is committed to secure transactions, verified accounts and a safe digital experience for all
-        users.
-      </p>
+
+      </div>
     </section>
+
+    <!-- ═══ 4. FOOTER NOTE ═══ -->
+    <section class="ct-trust reveal">
+      <p>Alina906Vibes is committed to secure transactions, verified accounts and a safe digital experience for all
+        users.</p>
+    </section>
+
   </main>
 
+  <!-- Footer -->
+  <footer class="ct-footer">
+    <small>© 2025 Alina906Vibes — Smart. Secure. Future-Ready.</small>
+  </footer>
+
   <script>
-    document.getElementById("contactForm").addEventListener("submit", e => {
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.style.getPropertyValue('--stagger') || '0s';
+          entry.target.style.transitionDelay = delay;
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(el => observer.observe(el));
+
+    // Form submit
+    document.getElementById('contactForm').addEventListener('submit', e => {
       e.preventDefault();
-      alert("Thank you! Your message has been sent successfully.");
+      document.getElementById('ct-success').style.display = 'flex';
       e.target.reset();
+      setTimeout(() => {
+        document.getElementById('ct-success').style.display = 'none';
+      }, 5000);
     });
   </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     crossorigin="anonymous"></script>
   <script src="js/nav.js"></script>
+
 </body>
 
 </html>

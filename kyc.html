@@ -1,68 +1,200 @@
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KYC Verification</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/kyc.css" />
+  <title>Identity Verification — Alina 906 Vibes</title>
+  <link rel="stylesheet" href="css/kyc-luxury.css" />
 </head>
-<body class="bg-light">
 
-  <main class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card shadow-sm p-4">
-          <h2 class="card-title mb-3 text-center">Verify Your Identity</h2>
-          <p class="text-center text-muted mb-4">Please upload your government ID or passport, plus a selfie for verification.</p>
+<body>
 
-      <form id="kycForm" enctype="multipart/form-data">
+  <div class="kyc-wrap">
+
+    <div class="kyc-brand">
+      <a href="index.html">Alina<span>906</span>Vibes</a>
+    </div>
+
+    <div class="kyc-card">
+
+      <div class="kyc-icon kyc-icon--neutral">
+        <svg viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      </div>
+
+      <span class="kyc-eyebrow">Identity Verification</span>
+      <h1>Verify your<br><em>identity.</em></h1>
+
+      <p class="kyc-message">
+        Upload a clear photo of your government ID and take a selfie to confirm your identity. Use good lighting for
+        best results.
+      </p>
+
+      <div class="kyc-rule"></div>
+
+      <form id="kycForm">
+
         <!-- Document type -->
-        <div class="mb-3">
-          <label for="documentType" class="form-label">Select Document Type</label>
-          <select id="documentType" name="documentType" class="form-select" required>
-            <option value="id">National ID</option>
-            <option value="passport">Passport</option>
-          </select>
+        <div class="kyc-form-group">
+          <label class="kyc-label" for="documentType">Document type</label>
+          <div class="kyc-select-wrap">
+            <select class="kyc-select" id="documentType" name="documentType" required>
+              <option value="id">National ID</option>
+              <option value="passport">Passport</option>
+            </select>
+          </div>
         </div>
 
         <!-- Document upload -->
-        <div class="mb-3">
-          <label for="document" class="form-label">Upload ID or Passport</label>
-          <input type="file" id="document" name="document" class="form-control" accept="image/*,application/pdf" required />
+        <div class="kyc-form-group">
+          <label class="kyc-label">Upload your document</label>
+          <label class="kyc-file-label" for="document" id="fileLabel">
+            <svg viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span id="fileLabelText">Choose file or drag and drop</span>
+          </label>
+          <input class="kyc-file-input" type="file" id="document" name="document" accept="image/*,application/pdf"
+            required />
         </div>
 
-<!-- Selfie capture -->
-<div class="mb-3">
-  <label class="form-label">Take a Selfie</label>
-  <video id="camera" autoplay playsinline class="form-control"></video>
-  <button type="button" id="captureBtn" class="btn btn-secondary mt-2">Capture Selfie</button>
-  <canvas id="preview" style="display:none"></canvas>
-  <p id="selfieStatus" class="mt-1"></p>
-</div>
+        <div class="kyc-rule"></div>
 
-
-        <!-- Status message -->
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary">Submit Verification</button>
+        <!-- Selfie capture -->
+        <div class="kyc-form-group">
+          <label class="kyc-label">Take a selfie</label>
+          <div class="kyc-video-wrap">
+            <video id="camera" autoplay playsinline></video>
+            <canvas id="preview"></canvas>
+          </div>
+          <div class="kyc-actions" style="margin-bottom: 0.5rem;">
+            <button type="button" class="kyc-btn kyc-btn--ghost" id="captureBtn">Capture Selfie</button>
+          </div>
+          <p id="selfieStatus" class="kyc-status kyc-status--success"></p>
         </div>
+
+        <div id="statusMessage" class="kyc-status kyc-status--error"></div>
+
+        <div class="kyc-actions">
+          <button type="submit" class="kyc-btn kyc-btn--primary" id="submitBtn">Submit Verification</button>
+        </div>
+
       </form>
 
-      <p id="statusMessage" class="mt-3 text-center text-success"></p>
     </div>
+
   </div>
-</div>
-```
 
-  </main>
+  <script>
+    const API_BASE = window.location.hostname === 'localhost'
+      ? 'http://localhost:5000'
+      : 'https://alina906vibes-backend.onrender.com';
 
-  <script src="js/kyc.js"></script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('uid');
 
-  <!-- Bootstrap JS bundle -->
+    const statusMsg = document.getElementById('statusMessage');
+    const selfieMsg = document.getElementById('selfieStatus');
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('preview');
+    const captureBtn = document.getElementById('captureBtn');
+    const fileInput = document.getElementById('document');
+    const fileLabelT = document.getElementById('fileLabelText');
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    let selfieBlob = null;
+
+    function showStatus(el, type, msg) {
+      el.textContent = msg;
+      el.className = `kyc-status kyc-status--${type}`;
+      el.style.display = 'block';
+    }
+
+    if (!userId) {
+      showStatus(statusMsg, 'error', '⚠ Missing user ID in URL.');
+      document.getElementById('kycForm').style.display = 'none';
+    }
+
+    // File label update
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files[0];
+      fileLabelT.textContent = f ? f.name : 'Choose file or drag and drop';
+    });
+
+    // Camera
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+        video.srcObject = stream;
+      } catch (err) {
+        showStatus(selfieMsg, 'error', 'Camera access denied. Please allow camera and reload.');
+        captureBtn.disabled = true;
+      }
+    })();
+
+    captureBtn.addEventListener('click', () => {
+      const ctx = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      canvas.style.display = 'block';
+      video.style.display = 'none';
+      canvas.toBlob(blob => {
+        selfieBlob = blob;
+        showStatus(selfieMsg, 'success', 'Selfie captured — looking good.');
+      }, 'image/jpeg', 0.92);
+      captureBtn.textContent = 'Retake Selfie';
+      captureBtn.onclick = () => {
+        canvas.style.display = 'none';
+        video.style.display = 'block';
+        selfieBlob = null;
+        selfieMsg.style.display = 'none';
+        captureBtn.textContent = 'Capture Selfie';
+        captureBtn.onclick = null;
+        captureBtn.addEventListener('click', arguments.callee, { once: true });
+      };
+    });
+
+    document.getElementById('kycForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      statusMsg.style.display = 'none';
+
+      const docFile = fileInput.files[0];
+      if (!docFile) { showStatus(statusMsg, 'error', 'Please upload your ID or passport.'); return; }
+      if (!selfieBlob) { showStatus(statusMsg, 'error', 'Please capture your selfie first.'); return; }
+
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Uploading\u2026';
+
+      const formData = new FormData();
+      formData.append('document', docFile);
+      formData.append('selfie', selfieBlob, 'selfie.jpg');
+      formData.append('documentType', document.getElementById('documentType').value);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/kyc-upload/${userId}`, { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (res.ok) {
+          showStatus(statusMsg, 'success', 'Verification submitted. Redirecting\u2026');
+          setTimeout(() => window.location.href = 'index.html', 1500);
+        } else {
+          showStatus(statusMsg, 'error', data.message || data.error || 'Upload failed.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Verification';
+        }
+      } catch (err) {
+        showStatus(statusMsg, 'error', 'Network error. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Verification';
+      }
+    });
+  </script>
 
 </body>
+
 </html>

@@ -1,40 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KYC Not Approved | Alina 906 Vibes</title>
-
-  <link rel="stylesheet" href="css/kyc-result.css" />
+  <title>Verification Unsuccessful — Alina 906 Vibes</title>
+  <link rel="stylesheet" href="css/kyc-luxury.css" />
 </head>
+
 <body>
 
-  <div class="container">
-    <div class="card">
-      <div class="icon error">✖</div>
+  <div class="kyc-wrap">
 
-      <h1>KYC Not Approved</h1>
-
-      <p class="message">
-        Unfortunately your identity verification was not approved.
-        This usually happens due to unclear documents or mismatched information.
-      </p>
-
-      <p class="message">
-        You can retry the verification process or contact support
-        if you believe this was a mistake.
-      </p>
-
-      <div class="actions">
-        <a href="kyc-start.html" class="btn primary">Retry Verification</a>
-        <a href="mailto:support@noventraadvisoryglobal.com" class="btn secondary">
-          Contact Support
-        </a>
-      </div>
+    <div class="kyc-brand">
+      <a href="index.html">Alina<span>906</span>Vibes</a>
     </div>
+
+    <div class="kyc-card">
+
+      <div class="kyc-icon kyc-icon--error">
+        <svg viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+
+      <span class="kyc-eyebrow">Verification Unsuccessful</span>
+      <h1>We couldn't<br><em>confirm you.</em></h1>
+
+      <p class="kyc-message">
+        Your identity verification was not approved. This sometimes happens due to document quality or a mismatch in
+        information — you can retry below.
+      </p>
+
+      <div class="kyc-rule"></div>
+
+      <span class="kyc-section-label">Common reasons</span>
+      <ul class="kyc-list">
+        <li>
+          <svg viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Photos were blurry, overexposed, or too dark to read</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>ID document was expired or edges were cut off in frame</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span>Details did not match between ID and selfie</span>
+        </li>
+      </ul>
+
+      <div class="kyc-actions">
+        <a href="kyc-start.html" class="kyc-btn kyc-btn--primary">Retry Verification</a>
+        <a href="mailto:support@noventraadvisoryglobal.com" class="kyc-btn kyc-btn--ghost">Contact Support</a>
+      </div>
+
+    </div>
+
   </div>
 
   <script src="js/kyc-rejected.js"></script>
-
 </body>
+
 </html>

@@ -3,14 +3,12 @@
    Glassmorphism · Animated · Responsive
    ═══════════════════════════════════════════ */
 
-/* ── Google Font (Inter for premium feel) ── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
     --nav-height: 72px;
     --nav-height-scrolled: 56px;
     --nav-height-mobile: 96px;
-    /* two-row height */
     --nav-bg: rgba(255, 255, 255, 0.78);
     --nav-bg-scrolled: rgba(255, 255, 255, 0.95);
     --nav-blur: 20px;
@@ -74,7 +72,6 @@
     transform: translateY(-100%);
 }
 
-/* ── Inner layout ── */
 .navbar-inner {
     max-width: 1280px;
     margin: 0 auto;
@@ -114,7 +111,7 @@
 }
 
 /* ═══════════════════════════════════════════
-   NAV LINKS — Centered
+   NAV LINKS
    ═══════════════════════════════════════════ */
 .navbar-links {
     list-style: none;
@@ -140,7 +137,6 @@
     transition: color var(--transition-fast), background var(--transition-fast);
 }
 
-/* Animated underline */
 .navbar-links a::after {
     content: '';
     position: absolute;
@@ -164,20 +160,15 @@
     transform: translateX(-50%) scaleX(1);
 }
 
-/* Active link */
 .navbar-links a.active {
     color: var(--accent-dark);
     font-weight: 600;
+    text-shadow: 0 0 20px var(--accent-glow);
 }
 
 .navbar-links a.active::after {
     transform: translateX(-50%) scaleX(1);
     background: var(--accent);
-}
-
-/* Soft glow on active */
-.navbar-links a.active {
-    text-shadow: 0 0 20px var(--accent-glow);
 }
 
 /* ═══════════════════════════════════════════
@@ -190,7 +181,6 @@
     flex-shrink: 0;
 }
 
-/* ── Auth buttons ── */
 .nav-btn {
     font-family: 'Inter', system-ui, sans-serif;
     font-weight: 600;
@@ -274,7 +264,6 @@
     line-height: 1;
 }
 
-/* Connected state */
 .wallet-connected {
     display: flex;
     align-items: center;
@@ -353,121 +342,19 @@
 }
 
 /* ═══════════════════════════════════════════
-   AVATAR DROPDOWN
+   AVATAR AREA WRAPPER
+   NOTE: All .avatar-btn / .avatar-menu / .avatar-initials /
+   .avatar-name / .avatar-menu-item styles live ONLY in
+   avatar-dropdown.css. We do NOT define OR reset them here.
    ═══════════════════════════════════════════ */
 .avatar-area {
     position: relative;
-}
-
-.avatar-btn {
-    height: 38px;
-    border-radius: var(--radius-pill);
-    border: 1.5px solid var(--accent);
-    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: all var(--transition-fast);
-    padding: 3px 14px 3px 4px;
-    box-shadow: 0 2px 8px var(--accent-glow);
-}
-
-.avatar-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px var(--accent-glow);
-}
-
-.avatar-initials {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Inter', system-ui, sans-serif;
-    font-weight: 700;
-    font-size: 0.8rem;
-    color: var(--text-white);
-    line-height: 1;
-    text-transform: uppercase;
     flex-shrink: 0;
 }
 
-.avatar-name {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-weight: 600;
-    font-size: 0.82rem;
-    color: var(--text-white);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 120px;
-}
-
-/* Dropdown menu */
-.avatar-menu {
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
-    min-width: 220px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: var(--radius-md);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.02);
-    padding: 8px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px) scale(0.97);
-    transition: opacity 0.2s ease, transform 0.25s var(--ease-spring), visibility 0.2s;
-    z-index: 1200;
-}
-
-.avatar-menu.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-}
-
-.avatar-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: var(--radius-sm);
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 0.88rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    text-decoration: none;
-    transition: background var(--transition-fast);
-    cursor: pointer;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-}
-
-.avatar-menu-item:hover {
-    background: var(--accent-soft);
-    color: var(--accent-dark);
-}
-
-.logout-item:hover {
-    background: rgba(239, 68, 68, 0.08);
-    color: #ef4444;
-}
-
-.avatar-menu-divider {
-    border: none;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    margin: 4px 8px;
-}
-
-/* KYC Badge */
+/* legacy KYC badge (booking pages only) */
 .kyc-badge {
     font-size: 0.72rem;
     font-weight: 700;
@@ -498,150 +385,17 @@
     color: #6b7280;
 }
 
-/* ═══════════════════════════════════════════
-   MOBILE HAMBURGER TOGGLE
-   ═══════════════════════════════════════════ */
-.mobile-toggle {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border: none;
-    background: var(--accent-soft);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    padding: 0;
-    gap: 5px;
-    transition: background var(--transition-fast);
-    z-index: 1300;
-    flex-shrink: 0;
-}
-
-.mobile-toggle:hover {
-    background: rgba(34, 197, 94, 0.15);
-}
-
-.hamburger-bar {
-    display: block;
-    width: 22px;
-    height: 2.5px;
-    border-radius: 2px;
-    background: var(--accent-dark);
-    transition: transform 0.35s var(--ease-spring),
-        opacity 0.25s ease,
-        width 0.3s var(--ease-out);
-    transform-origin: center;
-}
-
-/* Morphed to X */
-.mobile-toggle.active {
-    background: rgba(239, 68, 68, 0.08);
-}
-
-.mobile-toggle.active .hamburger-bar {
-    background: #ef4444;
-}
-
-.mobile-toggle.active .hamburger-bar:nth-child(1) {
-    transform: translateY(7.5px) rotate(45deg);
-}
-
-.mobile-toggle.active .hamburger-bar:nth-child(2) {
-    opacity: 0;
-    transform: scaleX(0);
-}
-
-.mobile-toggle.active .hamburger-bar:nth-child(3) {
-    transform: translateY(-7.5px) rotate(-45deg);
-}
-
-/* ═══════════════════════════════════════════
-   MOBILE FULL-SCREEN OVERLAY
-   ═══════════════════════════════════════════ */
-.mobile-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1150;
-    background: rgba(255, 255, 255, 0.97);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    transform: translateX(100%);
-    transition: transform 0.45s var(--ease-out);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    will-change: transform;
-}
-
-.mobile-overlay.open {
-    transform: translateX(0);
-}
-
-.mobile-overlay-content {
-    display: flex;
-    flex-direction: column;
-    padding: calc(var(--nav-height) + 24px) 32px 40px;
-    min-height: 100vh;
-    gap: 6px;
-}
-
-.mobile-nav-link {
+/* ─── Welcome greeting ─── */
+.nav-welcome {
     font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.78rem;
     font-weight: 600;
-    font-size: 1.25rem;
-    color: var(--text-primary);
-    text-decoration: none;
-    padding: 18px 20px;
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
-    display: flex;
-    align-items: center;
-    min-height: 56px;
-}
-
-.mobile-nav-link:hover,
-.mobile-nav-link.active {
-    background: var(--accent-soft);
     color: var(--accent-dark);
-    transform: translateX(4px);
-}
-
-.mobile-nav-link.active {
-    border-left: 3px solid var(--accent);
-}
-
-.mobile-divider {
-    border: none;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    margin: 12px 0;
-}
-
-.mobile-auth {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 8px 0;
-}
-
-.mobile-btn {
-    width: 100%;
-    padding: 14px 20px;
-    font-size: 0.95rem;
-    justify-content: center;
-    min-height: 50px;
-}
-
-.mobile-wallet {
-    padding: 8px 0;
-}
-
-.mobile-wallet-btn {
-    width: 100%;
-    padding: 14px 20px;
-    font-size: 0.95rem;
-    justify-content: center;
-    min-height: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    display: none;
 }
 
 /* ═══════════════════════════════════════════
@@ -657,23 +411,16 @@ body {
     }
 }
 
-
 /* ═══════════════════════════════════════════
    RESPONSIVE — Mobile ≤ 991px
-   Two-row inline navbar — NO hamburger
    ═══════════════════════════════════════════ */
 @media (max-width: 991px) {
 
-    /* Taller nav to fit two rows */
-    .alina-navbar {
-        height: var(--nav-height-mobile);
-    }
-
+    .alina-navbar,
     .alina-navbar.navbar-scrolled {
         height: var(--nav-height-mobile);
     }
 
-    /* Stack inner into two rows */
     .navbar-inner {
         flex-direction: column;
         align-items: stretch;
@@ -683,7 +430,6 @@ body {
         height: 100%;
     }
 
-    /* ── Row 1: Logo + nav links ── */
     .navbar-row1 {
         display: flex;
         align-items: center;
@@ -692,7 +438,6 @@ body {
         flex-shrink: 0;
     }
 
-    /* Nav links inline in row 1 (no absolute centering) */
     .navbar-links {
         display: flex !important;
         position: static;
@@ -710,25 +455,28 @@ body {
         flex-shrink: 0;
     }
 
-    /* ── Row 2: Auth + Wallet ── */
     .navbar-row2 {
         display: flex;
         align-items: center;
-        gap: 8px;
-        height: 40px;
+        gap: 6px;
+        height: 44px;
         flex-shrink: 0;
         padding-bottom: 4px;
         width: 100%;
+        overflow: visible;
+        /* ← allow avatar dropdown to bleed out */
     }
 
-    /* Show desktop actions in row 2 */
     .navbar-actions {
         display: flex !important;
+        flex-wrap: nowrap;
+        align-items: center;
         gap: 6px;
         width: 100%;
+        overflow: visible;
+        /* ← must be visible so dropdown shows */
     }
 
-    /* Compact buttons on mobile */
     .nav-btn {
         font-size: 0.72rem;
         padding: 5px 12px;
@@ -747,70 +495,21 @@ body {
         padding: 4px 9px 4px 8px;
     }
 
-    /* Hide welcome text label on very small screens (≤380px) */
-    .nav-welcome-text {
-        max-width: 90px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    /* Hide hamburger toggle completely */
-    .mobile-toggle {
-        display: none !important;
-    }
-
-    /* Avatar dropdown stays visible */
+    /* Avatar sits at the far right of row 2 */
     .avatar-area {
         margin-left: auto;
-    }
-
-    .avatar-btn {
-        height: 36px;
-        padding: 3px 12px 3px 3px;
-    }
-
-    .avatar-initials {
-        width: 26px;
-        height: 26px;
-        font-size: 0.7rem;
-    }
-
-    .avatar-name {
-        font-size: 0.75rem;
-        max-width: 90px;
+        overflow: visible;
+        /* ← critical: lets the dropdown panel escape */
+        flex-shrink: 0;
     }
 }
 
 @media (min-width: 992px) {
-    .mobile-overlay {
-        display: none !important;
-    }
 
-    .mobile-toggle {
-        display: none !important;
-    }
-
-    /* Restore single-row layout */
     .navbar-row1,
     .navbar-row2 {
         display: contents;
-        /* children participate in flex normally */
     }
-}
-
-/* ─── Welcome greeting (mobile row 2) ─── */
-.nav-welcome {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--accent-dark);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 120px;
-    display: none;
-    /* shown via JS when logged in on mobile */
 }
 
 /* ═══════════════════════════════════════════
@@ -820,11 +519,7 @@ body {
 
     .alina-navbar,
     .navbar-links a::after,
-    .wallet-status-dot,
-    .avatar-menu,
-    .mobile-overlay,
-    .hamburger-bar,
-    .mobile-toggle {
+    .wallet-status-dot {
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;
     }

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Account — Alina906Vibes</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/avatar-dropdown.css" />
+    <link rel="stylesheet" href="css/account.css" />
+</head>
+
+<body>
+
+    <!-- ═══ Status Toast ═══ -->
+    <div id="pageStatus" class="page-status" aria-live="polite"></div>
+
+    <!-- ═══ Navbar ═══ -->
+    <nav id="mainNavbar" class="alina-navbar">
+        <div class="navbar-inner">
+            <div class="navbar-row1">
+                <a class="navbar-logo" href="index.html">Alina<span>906</span>Vibes</a>
+                <ul class="navbar-links">
+                    <li><a href="index.html" data-page="index">Home</a></li>
+                    <li><a href="about.html" data-page="about">About</a></li>
+                    <li><a href="contact.html" data-page="contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="navbar-row2">
+                <div class="navbar-actions">
+                    <span class="nav-welcome" id="navWelcome"></span>
+                    <a id="loginLink" href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
+                    <a id="signupLink" href="signup.html" class="nav-btn nav-btn-solid">Sign Up</a>
+                    <div class="wallet-area" id="navWalletWrapper">
+                        <button id="connectWallet" class="wallet-connect-btn">
+                            <span class="wallet-icon">🦊</span> Connect Wallet
+                        </button>
+                        <div id="walletInfoRow" class="wallet-connected" style="display:none;">
+                            <span class="wallet-status-dot"></span>
+                            <span id="walletAddress" class="wallet-addr">—</span>
+                            <button id="disconnectWallet" class="wallet-disconnect-btn">✕</button>
+                        </div>
+                    </div>
+                    <div id="avatarDropdown" class="avatar-area" style="display:none;">
+                        <button class="avatar-btn" id="avatarToggle" aria-haspopup="true" aria-expanded="false"
+                            aria-label="Account menu">
+                            <span class="avatar-initials" id="avatarInitials">?</span>
+                            <span class="avatar-name" id="avatarName">User</span>
+                        </button>
+                        <div class="avatar-menu" id="avatarMenu" role="menu">
+                            <a href="my_booking.html" class="avatar-menu-item">📋 My Bookings</a>
+                            <a href="account.html" class="avatar-menu-item">👤 Account</a>
+                            <div class="avatar-menu-item kyc-status-item">
+                                🛡️ KYC Status <span id="kycBadge" class="kyc-badge">—</span>
+                            </div>
+                            <hr class="avatar-menu-divider">
+                            <button id="logoutBtn" class="avatar-menu-item logout-item">🚪 Log Out</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══ Login Prompt ═══ -->
+    <div id="loginPrompt" class="login-gate" style="display:none;">
+        <div class="login-gate-inner">
+            <div class="login-gate-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+            </div>
+            <h2>Members Only</h2>
+            <p>Sign in to access your private member dashboard.</p>
+            <a href="login.html" class="gate-btn">Sign In to Continue</a>
+        </div>
+    </div>
+
+    <!-- ═══ Main Dashboard ═══ -->
+    <main id="accountDashboard" class="dashboard" style="display:none;">
+
+        <!-- Identity Hero -->
+        <section class="identity-section" id="identitySection">
+            <div class="identity-bg-grain"></div>
+            <div class="identity-inner">
+                <div class="identity-avatar-wrap">
+                    <div class="identity-avatar" id="identityAvatar">
+                        <span class="avatar-letters" id="avatarLetters">—</span>
+                    </div>
+                    <div class="identity-verified-ring" id="verifiedRing" style="display:none;">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="22" stroke="#198754" stroke-width="1.5" stroke-dasharray="4 2"
+                                opacity="0.6" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="identity-text">
+                    <div class="identity-eyebrow">Alina Member</div>
+                    <h1 class="identity-name" id="identityName">—</h1>
+                    <div class="identity-email" id="identityEmail">—</div>
+                    <div class="identity-meta">
+                        <div class="identity-id">
+                            <span class="identity-id-label">Member ID</span>
+                            <span class="identity-id-value" id="memberId">ALN–000000</span>
+                        </div>
+                        <div class="identity-badge" id="identityBadge">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            <span id="badgeLabel">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="identity-stats" id="identityStats">
+                    <div class="identity-stat">
+                        <div class="stat-value" id="statBookings">—</div>
+                        <div class="stat-label">Bookings</div>
+                    </div>
+                    <div class="identity-stat-div"></div>
+                    <div class="identity-stat">
+                        <div class="stat-value" id="statActive">—</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                    <div class="identity-stat-div"></div>
+                    <div class="identity-stat">
+                        <div class="stat-value" id="statNights">—</div>
+                        <div class="stat-label">Nights</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+
+            <!-- Left column -->
+            <div class="dashboard-col dashboard-col--main">
+
+                <!-- Personal Information -->
+                <div class="acc-card" data-delay="0">
+                    <div class="acc-card-header">
+                        <div class="acc-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="acc-card-title">Personal Information</h2>
+                            <p class="acc-card-subtitle">Your registered profile details</p>
+                        </div>
+                    </div>
+                    <div class="acc-card-body">
+                        <div class="info-grid">
+                            <div class="info-field">
+                                <div class="info-label">Full Name</div>
+                                <div class="info-value" id="infoName">—</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Email Address</div>
+                                <div class="info-value" id="infoEmail">—</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Member Since</div>
+                                <div class="info-value" id="infoSince">—</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Account Status</div>
+                                <div class="info-value" id="infoStatus">—</div>
+                            </div>
+                        </div>
+                        <button class="acc-btn acc-btn--ghost" id="editProfileBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                            Edit Profile
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Identity Verification -->
+                <div class="acc-card" data-delay="1">
+                    <div class="acc-card-header">
+                        <div class="acc-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="acc-card-title">Identity Verification</h2>
+                            <p class="acc-card-subtitle">KYC status and access level</p>
+                        </div>
+                        <div class="acc-card-badge" id="kycStatusBadge">—</div>
+                    </div>
+                    <div class="acc-card-body">
+                        <div id="kycVerified" style="display:none;">
+                            <div class="kyc-verified-state">
+                                <div class="kyc-verified-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5">
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="kyc-verified-title">Identity Confirmed</div>
+                                    <div class="kyc-verified-sub">You have full access to all premium stays and booking
+                                        privileges.</div>
+                                </div>
+                            </div>
+                            <div class="kyc-perks">
+                                <div class="kyc-perk">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Access to premium & long-stay properties
+                                </div>
+                                <div class="kyc-perk">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Priority booking confirmation
+                                </div>
+                                <div class="kyc-perk">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Enhanced trust with property hosts
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="kycUnverified" style="display:none;">
+                            <div class="kyc-cta-card">
+                                <div class="kyc-cta-text">
+                                    <div class="kyc-cta-title">Unlock Full Membership</div>
+                                    <div class="kyc-cta-desc">Verification grants access to premium stays, longer
+                                        bookings and priority support. The process takes under 3 minutes.</div>
+                                </div>
+                                <ul class="kyc-cta-list">
+                                    <li>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                        Government-issued ID
+                                    </li>
+                                    <li>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                        Takes under 3 minutes
+                                    </li>
+                                    <li>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                        Data stays private and encrypted
+                                    </li>
+                                </ul>
+                                <button class="acc-btn acc-btn--primary" id="startKycBtn">Begin Verification</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="acc-card" data-delay="2">
+                    <div class="acc-card-header">
+                        <div class="acc-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="acc-card-title">Security</h2>
+                            <p class="acc-card-subtitle">Password and account access</p>
+                        </div>
+                    </div>
+                    <div class="acc-card-body">
+                        <div class="security-rows">
+                            <div class="security-row">
+                                <div class="security-row-info">
+                                    <div class="security-row-title">Password</div>
+                                    <div class="security-row-sub">Last changed — never</div>
+                                </div>
+                                <button class="acc-btn acc-btn--ghost acc-btn--sm"
+                                    id="changePasswordBtn">Change</button>
+                            </div>
+                            <div class="security-row">
+                                <div class="security-row-info">
+                                    <div class="security-row-title">Two-Factor Authentication</div>
+                                    <div class="security-row-sub">Add an extra layer of protection</div>
+                                </div>
+                                <span class="acc-status-chip acc-status-chip--off">Not enabled</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right column -->
+            <div class="dashboard-col dashboard-col--side">
+
+                <!-- Wallet & Blockchain -->
+                <div class="acc-card acc-card--blockchain" data-delay="0">
+                    <div class="acc-card-header">
+                        <div class="acc-card-icon acc-card-icon--green">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <path
+                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="acc-card-title">Wallet & Blockchain</h2>
+                            <p class="acc-card-subtitle">Polygon Amoy Testnet</p>
+                        </div>
+                        <div class="network-pill" id="networkPill" style="display:none;">
+                            <span class="network-dot"></span>
+                            Polygon
+                        </div>
+                    </div>
+                    <div class="acc-card-body">
+                        <!-- Connected state -->
+                        <div id="walletConnected" style="display:none;">
+                            <div class="wallet-address-block">
+                                <div class="wallet-address-label">Connected Address</div>
+                                <div class="wallet-address-row">
+                                    <code class="wallet-address-code" id="walletAddrDisplay">—</code>
+                                    <button class="copy-btn" id="copyWalletBtn" aria-label="Copy address">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="blockchain-benefits">
+                                <div class="benefit-item">
+                                    <div class="benefit-icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <polyline points="12 6 12 12 16 14" />
+                                        </svg>
+                                    </div>
+                                    <div class="benefit-text">Instant booking confirmation via on-chain payment</div>
+                                </div>
+                                <div class="benefit-item">
+                                    <div class="benefit-icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        </svg>
+                                    </div>
+                                    <div class="benefit-text">Immutable payment records you own forever</div>
+                                </div>
+                                <div class="benefit-item">
+                                    <div class="benefit-icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                        </svg>
+                                    </div>
+                                    <div class="benefit-text">Enhanced privacy — no middlemen in your transactions</div>
+                                </div>
+                            </div>
+                            <button class="acc-btn acc-btn--ghost acc-btn--danger acc-btn--sm" id="disconnectWalletBtn">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                    <polyline points="16 17 21 12 16 7" />
+                                    <line x1="21" y1="12" x2="9" y2="12" />
+                                </svg>
+                                Disconnect Wallet
+                            </button>
+                        </div>
+
+                        <!-- Disconnected state -->
+                        <div id="walletDisconnected">
+                            <div class="wallet-cta">
+                                <div class="wallet-cta-graphic">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1">
+                                        <path
+                                            d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+                                        <path d="M16 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0z" fill="currentColor" />
+                                        <path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" />
+                                    </svg>
+                                </div>
+                                <div class="wallet-cta-title">Connect Your Wallet</div>
+                                <div class="wallet-cta-desc">Link a Web3 wallet to enable crypto payments, on-chain
+                                    booking records and full Alina blockchain features.</div>
+                                <button class="acc-btn acc-btn--blockchain" id="connectWalletAccountBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path
+                                            d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+                                        <path d="M16 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0z" fill="currentColor" />
+                                    </svg>
+                                    Connect MetaMask
+                                </button>
+                                <div class="wallet-cta-sub">Supports MetaMask · Polygon Amoy Testnet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Overview -->
+                <div class="acc-card" data-delay="1">
+                    <div class="acc-card-header">
+                        <div class="acc-card-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="acc-card-title">Booking Overview</h2>
+                            <p class="acc-card-subtitle">Your stay history at a glance</p>
+                        </div>
+                    </div>
+                    <div class="acc-card-body">
+                        <div class="overview-stats">
+                            <div class="overview-stat">
+                                <div class="overview-stat-num" id="ovTotal">—</div>
+                                <div class="overview-stat-lbl">Total Bookings</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="overview-stat-num overview-stat-num--green" id="ovActive">—</div>
+                                <div class="overview-stat-lbl">Active Stays</div>
+                            </div>
+                            <div class="overview-stat">
+                                <div class="overview-stat-num" id="ovCompleted">—</div>
+                                <div class="overview-stat-lbl">Completed</div>
+                            </div>
+                        </div>
+                        <div class="overview-chain-note">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                            </svg>
+                            All payments recorded transparently on-chain
+                        </div>
+                        <a href="my_booking.html" class="acc-btn acc-btn--ghost acc-btn--full">View All Bookings</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Member Controls / Danger Zone -->
+        <div class="danger-section" data-delay="3">
+            <div class="danger-header">
+                <h2 class="danger-title">Member Controls</h2>
+                <p class="danger-sub">Manage your account access and data. These actions are permanent where noted.</p>
+            </div>
+            <div class="danger-actions">
+                <div class="danger-item">
+                    <div class="danger-item-info">
+                        <div class="danger-item-title">Sign Out</div>
+                        <div class="danger-item-desc">End your current session on this device.</div>
+                    </div>
+                    <button class="acc-btn acc-btn--ghost acc-btn--sm" id="logoutAccountBtn">Sign Out</button>
+                </div>
+                <div class="danger-item">
+                    <div class="danger-item-info">
+                        <div class="danger-item-title">Deactivate Account</div>
+                        <div class="danger-item-desc">Temporarily hide your profile. You can reactivate at any time.
+                        </div>
+                    </div>
+                    <button class="acc-btn acc-btn--ghost acc-btn--danger acc-btn--sm"
+                        id="deactivateBtn">Deactivate</button>
+                </div>
+                <div class="danger-item danger-item--terminal">
+                    <div class="danger-item-info">
+                        <div class="danger-item-title">Delete Account</div>
+                        <div class="danger-item-desc">Permanently remove your account and all associated data. This
+                            cannot be undone.</div>
+                    </div>
+                    <button class="acc-btn acc-btn--delete acc-btn--sm" id="deleteAccountBtn">Delete Account</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Password Change Modal -->
+    <div class="modal-overlay" id="passwordModalOverlay">
+        <div class="modal-box" role="dialog" aria-modal="true" aria-label="Change Password">
+            <div class="modal-box-header">
+                <h3 class="modal-box-title">Change Password</h3>
+                <button class="modal-close-btn" id="closePasswordModal" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-box-body">
+                <div class="modal-field">
+                    <label class="modal-label">Current Password</label>
+                    <input type="password" class="modal-input" id="currentPassword" placeholder="••••••••" />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">New Password</label>
+                    <input type="password" class="modal-input" id="newPassword" placeholder="••••••••" />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Confirm New Password</label>
+                    <input type="password" class="modal-input" id="confirmPassword" placeholder="••••••••" />
+                </div>
+            </div>
+            <div class="modal-box-footer">
+                <button class="acc-btn acc-btn--ghost" id="cancelPasswordBtn">Cancel</button>
+                <button class="acc-btn acc-btn--primary" id="savePasswordBtn">Update Password</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="acc-footer">
+        <span>© 2025 Alina906Vibes — Built on Polygon Amoy Testnet</span>
+        <span class="acc-footer-div">·</span>
+        <span>Member Dashboard v1.0</span>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/account.js"></script>
+</body>
+
+</html>

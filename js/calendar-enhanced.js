@@ -1,7 +1,16 @@
 /**
- * calendar-enhanced.js
+ * calendar-enhanced.js  v2.1
  * ─────────────────────────────────────────────────────────────────
  * Enhances booking.html without replacing booking.js.
+ *
+ * CHANGELOG v2.1
+ * ──────────────
+ * FIX:  Mobile touch events — replaced click-only listeners with
+ *       unified pointer/touch event handling so real mobile devices
+ *       can select multi-day ranges.
+ * ADD:  Editable fallback input row (Check-in / Check-out date
+ *       inputs + read-only Duration) placed below the calendar.
+ *       Inputs sync bidirectionally with the calendar state.
  *
  * ═══════════════════════════════════════════════════════════════
  * SELECTION MODEL  (exclusive end-date, always intact)
@@ -19,43 +28,51 @@
  *    #endDate   = endDate  (exclusive)
  *
  * ───────────────────────────────────────────────────────────────
- * CLICK RULES
+ * CLICK / TAP RULES
  * ───────────────────────────────────────────────────────────────
  *
  *  Phase IDLE  (nothing selected)
- *    Click any available date D
+ *    Tap any available date D
  *      → checkIn = lastNight = D   (1-night stay, immediately complete)
  *        endDate = D + 1
- *        Highlight only [D].       (D+1 = checkout, never highlighted)
+ *        Highlight only [D].
  *        Phase → ANCHORED
  *
  *  Phase ANCHORED
- *    Double-click checkIn (same date clicked twice)
+ *    Double-tap checkIn (same date tapped twice)
  *      → clear everything.
  *        Phase → IDLE
  *
- *    Click date AFTER checkIn  (including extending past lastNight, or
- *                               shrinking by clicking between ci and ln)
- *      → lastNight = clicked date.
- *        endDate   = clicked + 1.
- *        Highlight [checkIn … clicked].
- *        Checkout (endDate) NOT highlighted.
+ *    Tap date AFTER checkIn
+ *      → lastNight = tapped date.
+ *        endDate   = tapped + 1.
+ *        Highlight [checkIn … tapped].
  *        Phase stays ANCHORED.
  *
- *    Click date BEFORE checkIn
- *      → reset: checkIn = lastNight = clicked (new 1-night anchor).
+ *    Tap date BEFORE checkIn
+ *      → reset: checkIn = lastNight = tapped (new 1-night anchor).
  *        Phase stays ANCHORED.
  *
  *  Range must be contiguous and free of booked dates.
- *  If a booked date is in the proposed range, show an error, leave state unchanged.
  *
- * ───────────────────────────────────────────────────────────────
- * HOVER PREVIEW  (ANCHORED only, forward extension only)
- * ───────────────────────────────────────────────────────────────
- *  While ANCHORED, hovering a date > lastNight previews
- *  the extension band (lastNight, hoverDate] in a lighter colour.
- *  The committed selection is not re-coloured during hover.
- *
+ * ─────────────────────────────────────────────────────────────────
+ * MOBILE TOUCH FIX
+ * ─────────────────────────────────────────────────────────────────
+ *  Root causes addressed:
+ *    1. On real mobile devices the browser fires touchstart →
+ *       touchend → (300ms delay) → click.  If the page scrolls
+ *       even slightly between touchstart and touchend the 'click'
+ *       is suppressed entirely.  We therefore listen to 'touchend'
+ *       in addition to 'click' and deduplicate using a timestamp
+ *       guard (TOUCH_DEDUPE_MS).
+ *    2. Passive listeners on the scroll container can swallow
+ *       touch events before they reach individual cells.  All
+ *       calendar touch listeners are registered as {passive:false}
+ *       and we call preventDefault() on touchend to stop the
+ *       synthesised click from firing a second time.
+ *    3. CSS `touch-action: none` is added to day cells so the
+ *       browser does not initiate a scroll gesture on the first
+ *       tap, which was swallowing the selection taps.
  * ─────────────────────────────────────────────────────────────────
  */
 
@@ -63,6 +80,10 @@
     'use strict';
 
     const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    // Deduplicate touch → click ghost events within this window (ms)
+    const TOUCH_DEDUPE_MS = 400;
+    let _lastTouchTime = 0;
 
     // ── State ──────────────────────────────────────────────────────
     const S = {
@@ -72,13 +93,15 @@
         bookedSet: new Set(),
         rawBookings: [],
 
-        checkIn: null,   // first night, inclusive
-        lastNight: null,   // last  night, inclusive
-        phase: 'IDLE', // 'IDLE' | 'ANCHORED'
+        checkIn: null,     // first night, inclusive  'YYYY-MM-DD'
+        lastNight: null,   // last  night, inclusive  'YYYY-MM-DD'
+        phase: 'IDLE',     // 'IDLE' | 'ANCHORED'
         hoverDate: null,   // forward-extension preview
     };
 
     let $calSection, $wrap, $hint, $chips, $cta;
+    // References to the fallback input row elements
+    let $fbCheckIn, $fbCheckOut, $fbDuration;
 
     // ─────────────────────────────────────────────────────────────
     // DATE UTILITIES
@@ -119,10 +142,8 @@
     // DERIVED
     // ─────────────────────────────────────────────────────────────
 
-    /** Exclusive checkout date, or null. */
     function getEndDate() { return S.lastNight ? addDays(S.lastNight, 1) : null; }
 
-    /** Number of booked nights (0 if IDLE or incomplete). */
     function getNights() {
         return (S.checkIn && S.lastNight) ? diffDays(S.checkIn, getEndDate()) : 0;
     }
@@ -144,7 +165,6 @@
                 set.add(toLocalStr(cur));
                 cur.setDate(cur.getDate() + 1);
             }
-            // endDate itself stays free (exclusive model)
         });
         return set;
     }
@@ -153,12 +173,6 @@
     // CSS CLASS BUILDER
     // ─────────────────────────────────────────────────────────────
 
-    /**
-     * Highlighted band: [checkIn … lastNight] inclusive.
-     * endDate (lastNight+1) gets NO selection class — it is the checkout day.
-     *
-     * Hover band (ANCHORED, forward only): (lastNight, hoverDate] exclusive-start.
-     */
     function buildDayClasses(dateStr, today) {
         const cls = ['calendar-day'];
 
@@ -171,13 +185,11 @@
         const ci = S.checkIn;
         const ln = S.lastNight;
 
-        if (!ci) return cls.join(' ');   // IDLE — nothing to mark
+        if (!ci) return cls.join(' ');
 
-        // ── Committed selection ──
         if (ln && dateStr >= ci && dateStr <= ln) {
             cls.push('cal-selected');
             if (ci === ln) {
-                // Single night — fully rounded
                 cls.push('cal-start', 'cal-end');
             } else if (dateStr === ci) {
                 cls.push('cal-start');
@@ -188,9 +200,7 @@
             }
             return cls.join(' ');
         }
-        // dateStr === endDate → intentionally no class (checkout day)
 
-        // ── Hover extension preview (only forward of lastNight) ──
         if (
             S.phase === 'ANCHORED' &&
             S.hoverDate &&
@@ -207,14 +217,13 @@
     }
 
     // ─────────────────────────────────────────────────────────────
-    // CLICK HANDLER
+    // CLICK / TOUCH HANDLER  ← KEY FIX FOR MOBILE
     // ─────────────────────────────────────────────────────────────
 
     function handleClick(dateStr) {
         const today = todayStr();
         if (dateStr < today || S.bookedSet.has(dateStr)) return;
 
-        // ── IDLE: first click → 1-night selection, immediately complete ──
         if (S.phase === 'IDLE') {
             S.checkIn = dateStr;
             S.lastNight = dateStr;
@@ -222,12 +231,12 @@
             S.phase = 'ANCHORED';
             render();
             syncInputs();
+            syncFallbackInputs();
             updateCta();
             return;
         }
 
-        // ── ANCHORED ──
-        // Double-click checkIn → cancel everything
+        // ANCHORED — double-tap checkIn → cancel
         if (dateStr === S.checkIn) {
             S.checkIn = null;
             S.lastNight = null;
@@ -235,24 +244,25 @@
             S.phase = 'IDLE';
             render();
             syncInputs();
+            syncFallbackInputs();
             updateCta();
             return;
         }
 
-        // Click BEFORE checkIn → new 1-night anchor
+        // Tap BEFORE checkIn → new anchor
         if (dateStr < S.checkIn) {
             S.checkIn = dateStr;
             S.lastNight = dateStr;
             S.hoverDate = null;
             render();
             syncInputs();
+            syncFallbackInputs();
             updateCta();
             return;
         }
 
-        // Click AFTER checkIn (extend forward, or shrink by clicking within range):
-        // Validate [checkIn, clicked] is entirely free.
-        const proposedEnd = addDays(dateStr, 1);   // exclusive
+        // Tap AFTER checkIn → extend range
+        const proposedEnd = addDays(dateStr, 1);
         if (!isRangeFree(S.checkIn, proposedEnd)) {
             showStatusMsg('Selected range includes unavailable dates.', 'error');
             return;
@@ -262,6 +272,7 @@
         S.hoverDate = null;
         render();
         syncInputs();
+        syncFallbackInputs();
         updateCta();
 
         // Pop animation
@@ -272,26 +283,56 @@
         }
     }
 
+    /**
+     * Attach both 'touchend' (mobile) and 'click' (desktop) to a day cell.
+     * touchend fires before the synthetic click, so we call preventDefault()
+     * to stop the browser from firing both.  A timestamp guard prevents the
+     * rare case where both events slip through (e.g. some older Android WebViews).
+     */
+    function attachDayInteraction(cell, dateStr) {
+        // ── Touch (mobile) ──
+        cell.addEventListener('touchend', (e) => {
+            // Prevent the browser's synthesised mouse/click event
+            e.preventDefault();
+
+            _lastTouchTime = Date.now();
+            handleClick(dateStr);
+        }, { passive: false });
+
+        // ── Click (desktop / fallback) ──
+        cell.addEventListener('click', () => {
+            // Skip if a touch event just fired within dedupe window
+            if (Date.now() - _lastTouchTime < TOUCH_DEDUPE_MS) return;
+            handleClick(dateStr);
+        });
+
+        // ── Hover preview (pointer devices only) ──
+        cell.addEventListener('mouseenter', () => handleHover(dateStr));
+
+        cell.setAttribute('role', 'button');
+        cell.setAttribute('tabindex', '0');
+        cell.setAttribute('aria-label', buildAriaLabel(dateStr));
+
+        cell.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(dateStr); }
+        });
+    }
+
     // ─────────────────────────────────────────────────────────────
-    // HOVER HANDLER  (forward extension preview only)
+    // HOVER HANDLER
     // ─────────────────────────────────────────────────────────────
 
     function handleHover(dateStr) {
         if (S.phase !== 'ANCHORED' || !S.lastNight) return;
-
-        // Only preview strictly beyond lastNight
         if (dateStr <= S.lastNight) {
             if (S.hoverDate !== null) { S.hoverDate = null; render(); }
             return;
         }
-
-        // Stop preview if extending would cross a booked night
         const proposedEnd = addDays(dateStr, 1);
         if (!isRangeFree(S.checkIn, proposedEnd)) {
             if (S.hoverDate !== null) { S.hoverDate = null; render(); }
             return;
         }
-
         if (S.hoverDate === dateStr) return;
         S.hoverDate = dateStr;
         render();
@@ -315,9 +356,54 @@
         $start.value = S.checkIn || '';
         $end.value = getEndDate() || '';
 
-        // booking.js listens to these change events to recalculate price
         $start.dispatchEvent(new Event('change', { bubbles: true }));
         $end.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // SYNC → Fallback date inputs (below calendar)
+    // ─────────────────────────────────────────────────────────────
+
+    function syncFallbackInputs() {
+        if ($fbCheckIn) $fbCheckIn.value = S.checkIn || '';
+        if ($fbCheckOut) $fbCheckOut.value = getEndDate() || '';
+        updateFallbackDuration();
+    }
+
+    function updateFallbackDuration() {
+        if (!$fbDuration) return;
+        const n = getNights();
+        $fbDuration.value = n > 0 ? `${n} night${n !== 1 ? 's' : ''}` : '';
+    }
+
+    /**
+     * Apply a date string typed into the fallback inputs back into S.
+     * Validates: endDate > startDate, no booked dates in range.
+     */
+    function applyFallbackDates(checkIn, endDate) {
+        const today = todayStr();
+
+        if (!checkIn || !endDate) return;
+        if (checkIn < today) { showStatusMsg('Check-in cannot be in the past.', 'error'); return; }
+        if (endDate <= checkIn) { showStatusMsg('Check-out must be after check-in.', 'error'); return; }
+
+        if (!isRangeFree(checkIn, endDate)) {
+            showStatusMsg('Selected range includes unavailable dates.', 'error');
+            return;
+        }
+
+        // lastNight = endDate - 1 (convert exclusive endDate to inclusive lastNight)
+        const lastNight = addDays(endDate, -1);
+
+        S.checkIn = checkIn;
+        S.lastNight = lastNight;
+        S.hoverDate = null;
+        S.phase = 'ANCHORED';
+
+        render();
+        syncInputs();
+        updateFallbackDuration();
+        updateCta();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -365,8 +451,13 @@
 
         $calSection.insertBefore($wrap, $hint.nextSibling);
 
+        // Chips row (replaced by fallback inputs — chips still updated for desktop)
         if (!$chips) buildChips();
         updateChips();
+
+        // Ensure fallback input row exists and is up-to-date
+        buildFallbackInputsIfNeeded();
+        syncFallbackInputs();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -436,14 +527,7 @@
             cell.dataset.date = dateStr;
 
             if (cell.classList.contains('available')) {
-                cell.addEventListener('click', () => handleClick(dateStr));
-                cell.addEventListener('mouseenter', () => handleHover(dateStr));
-                cell.setAttribute('role', 'button');
-                cell.setAttribute('tabindex', '0');
-                cell.setAttribute('aria-label', buildAriaLabel(dateStr));
-                cell.addEventListener('keydown', e => {
-                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(dateStr); }
-                });
+                attachDayInteraction(cell, dateStr);
             }
 
             daysGrid.appendChild(cell);
@@ -458,7 +542,7 @@
     function buildAriaLabel(dateStr) {
         const h = humanDate(dateStr);
         if (S.phase === 'IDLE') return `Select ${h} as check-in`;
-        if (dateStr === S.checkIn) return `${h} — double-click to cancel`;
+        if (dateStr === S.checkIn) return `${h} — tap again to cancel`;
         if (dateStr > (S.lastNight || '')) return `Extend stay to ${h}`;
         if (dateStr > S.checkIn) return `Shorten stay, last night ${h}`;
         return h;
@@ -472,20 +556,20 @@
         if (!$hint) return;
         const txt = $hint.querySelector('.enh-hint-txt');
         if (S.phase === 'IDLE') {
-            txt.textContent = 'Click a date to select check-in — 1 night by default, then extend by clicking a later date';
+            txt.textContent = 'Tap a date to select check-in — 1 night by default, then tap a later date to extend';
             $hint.classList.remove('enh-hint-hidden');
         } else {
             const nights = getNights();
             const end = getEndDate();
             txt.textContent =
                 `${humanDate(S.checkIn)} → checkout ${humanDate(end)} · ${nights} night${nights !== 1 ? 's' : ''}` +
-                ` — click a later date to extend, or double-click check-in to reset`;
+                ` — tap a later date to extend, or tap check-in again to reset`;
             $hint.classList.remove('enh-hint-hidden');
         }
     }
 
     // ─────────────────────────────────────────────────────────────
-    // CHIPS
+    // CHIPS (summary row above fallback inputs)
     // ─────────────────────────────────────────────────────────────
 
     function buildChips() {
@@ -518,7 +602,6 @@
         }
         if ($chips.checkout) {
             const chip = $chips.checkout.closest('.enh-chip');
-            // Show the actual checkout date (endDate) — guests plan their departure by this
             $chips.checkout.innerHTML = endDate ? humanDate(endDate) : '<span class="enh-chip-empty">Add date</span>';
             chip?.classList.toggle('active', !!endDate);
         }
@@ -526,6 +609,119 @@
             const chip = $chips.nights.closest('.enh-chip');
             $chips.nights.innerHTML = nights > 0 ? `${nights} night${nights !== 1 ? 's' : ''}` : '<span class="enh-chip-empty">—</span>';
             chip?.classList.toggle('active', nights > 0);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // FALLBACK INPUT ROW  (editable date inputs below calendar)
+    // ─────────────────────────────────────────────────────────────
+
+    function buildFallbackInputsIfNeeded() {
+        if ($calSection.querySelector('.enh-fallback-row')) return; // Already built
+
+        const today = todayStr();
+
+        const row = document.createElement('div');
+        row.className = 'enh-fallback-row';
+        row.setAttribute('role', 'group');
+        row.setAttribute('aria-label', 'Manual date selection');
+
+        // ── Check-in input ──
+        const ciWrap = document.createElement('div');
+        ciWrap.className = 'enh-fb-field';
+        ciWrap.innerHTML = '<label class="enh-fb-label">Check-in</label>';
+        $fbCheckIn = document.createElement('input');
+        $fbCheckIn.type = 'date';
+        $fbCheckIn.className = 'enh-fb-input';
+        $fbCheckIn.setAttribute('aria-label', 'Check-in date');
+        $fbCheckIn.min = today;
+        ciWrap.appendChild($fbCheckIn);
+
+        // ── Check-out input ──
+        const coWrap = document.createElement('div');
+        coWrap.className = 'enh-fb-field';
+        coWrap.innerHTML = '<label class="enh-fb-label">Check-out</label>';
+        $fbCheckOut = document.createElement('input');
+        $fbCheckOut.type = 'date';
+        $fbCheckOut.className = 'enh-fb-input';
+        $fbCheckOut.setAttribute('aria-label', 'Check-out date');
+        $fbCheckOut.min = today;
+        coWrap.appendChild($fbCheckOut);
+
+        // ── Duration (read-only) ──
+        const durWrap = document.createElement('div');
+        durWrap.className = 'enh-fb-field enh-fb-duration';
+        durWrap.innerHTML = '<label class="enh-fb-label">Duration</label>';
+        $fbDuration = document.createElement('input');
+        $fbDuration.type = 'text';
+        $fbDuration.className = 'enh-fb-input enh-fb-readonly';
+        $fbDuration.readOnly = true;
+        $fbDuration.setAttribute('aria-label', 'Stay duration');
+        $fbDuration.placeholder = '—';
+        durWrap.appendChild($fbDuration);
+
+        // ── Error message ──
+        const errMsg = document.createElement('div');
+        errMsg.className = 'enh-fb-error';
+        errMsg.setAttribute('role', 'alert');
+        errMsg.setAttribute('aria-live', 'polite');
+
+        row.appendChild(ciWrap);
+        row.appendChild(coWrap);
+        row.appendChild(durWrap);
+        row.appendChild(errMsg);
+
+        $calSection.appendChild(row);
+
+        // ── Event listeners ──
+
+        function showFbError(msg) {
+            errMsg.textContent = msg;
+            errMsg.style.display = msg ? 'block' : 'none';
+            if (msg) setTimeout(() => { errMsg.textContent = ''; errMsg.style.display = 'none'; }, 4000);
+        }
+
+        $fbCheckIn.addEventListener('change', () => {
+            const ci = $fbCheckIn.value;
+            const co = $fbCheckOut.value;
+            if (!ci) return;
+
+            // Update checkout minimum
+            $fbCheckOut.min = addDays(ci, 1);
+
+            if (co && co <= ci) {
+                // Auto-advance checkout to ci + 1
+                $fbCheckOut.value = addDays(ci, 1);
+            }
+
+            if (ci && $fbCheckOut.value) {
+                const problem = validate(ci, $fbCheckOut.value);
+                if (problem) { showFbError(problem); return; }
+                applyFallbackDates(ci, $fbCheckOut.value);
+            } else if (ci) {
+                // Only check-in set — partially update state
+                const nextD = addDays(ci, 1);
+                applyFallbackDates(ci, nextD);
+                $fbCheckOut.value = nextD;
+            }
+        });
+
+        $fbCheckOut.addEventListener('change', () => {
+            const ci = $fbCheckIn.value;
+            const co = $fbCheckOut.value;
+            if (!co) return;
+            if (!ci) { showFbError('Please select a check-in date first.'); $fbCheckOut.value = ''; return; }
+            const problem = validate(ci, co);
+            if (problem) { showFbError(problem); return; }
+            applyFallbackDates(ci, co);
+        });
+
+        function validate(ci, co) {
+            const t = todayStr();
+            if (ci < t) return 'Check-in cannot be in the past.';
+            if (co <= ci) return 'Check-out must be after check-in.';
+            if (!isRangeFree(ci, co)) return 'Selected range includes booked dates. Please choose different dates.';
+            return null;
         }
     }
 
@@ -627,6 +823,9 @@
         window.renderCalendar = function (bookings) {
             S.rawBookings = bookings || [];
             S.bookedSet = buildBookedSet(S.rawBookings);
+            // Update fallback input min dates when booked data arrives
+            if ($fbCheckIn) $fbCheckIn.min = todayStr();
+            if ($fbCheckOut) $fbCheckOut.min = todayStr();
             render();
         };
     }
@@ -671,7 +870,7 @@
         getState: () => ({
             checkIn: S.checkIn,
             lastNight: S.lastNight,
-            endDate: getEndDate(),   // exclusive — what booking.js / backend sees
+            endDate: getEndDate(),
             nights: getNights(),
             phase: S.phase,
         }),

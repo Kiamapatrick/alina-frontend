@@ -107,18 +107,7 @@
     &copy; 2025 Alina906Vibes — Built on Polygon Amoy Testnet
   </footer>
 
-  <script>
-    /* ── Password toggle ── */
-    document.querySelectorAll('.password-toggle').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const input = btn.closest('.field-wrap').querySelector('input');
-        const isHidden = input.type === 'password';
-        input.type = isHidden ? 'text' : 'password';
-        btn.textContent = isHidden ? '🙈' : '👁️';
-      });
-    });
-  </script>
-
+  <script src="js/auth-common.js"></script>
   <script src="js/login.js"></script>
 </body>
 

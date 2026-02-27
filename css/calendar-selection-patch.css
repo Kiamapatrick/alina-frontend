@@ -1,72 +1,51 @@
 /* ═══════════════════════════════════════════════════════════════
-   calendar-selection-patch.css
+   calendar-selection-patch.css  v2.1
    Load AFTER booking-enhanced.css.
 
-   Provides precise border-radius shaping for the selection band
-   and hover extension preview used by calendar-enhanced.js.
+   Provides:
+   1. Precise border-radius shaping for the selection band.
+   2. Hover extension preview styling.
+   3. Pop animation for click feedback.
+   4. Mobile touch-action fix to prevent scroll interference.
+   5. Editable fallback input row styles (.enh-fallback-row).
    ═══════════════════════════════════════════════════════════════ */
 
 
 /* ── 1. Selection band shaping ──────────────────────────────── */
 
-/*
-   Single-night  (cal-start + cal-end on same cell):
-   Fully rounded pill — no connection to adjacent cells.
-*/
 .enh-days .calendar-day.cal-selected.cal-start.cal-end,
 #calendar .calendar-day.cal-selected.cal-start.cal-end {
     border-radius: 8px !important;
 }
 
-/*
-   Multi-night check-in cell (left cap):
-   Right side flush so it visually connects to the range band.
-*/
 .enh-days .calendar-day.cal-start:not(.cal-end),
 #calendar .calendar-day.cal-start:not(.cal-end) {
     border-radius: 8px 0 0 8px;
 }
 
-/*
-   Multi-night last-night cell (right cap):
-   Left side flush so it connects to the range band.
-*/
 .enh-days .calendar-day.cal-end:not(.cal-start),
 #calendar .calendar-day.cal-end:not(.cal-start) {
     border-radius: 0 8px 8px 0;
 }
 
-/*
-   Mid-range cells: no rounding — seamless band.
-*/
 .enh-days .calendar-day.cal-range,
 #calendar .calendar-day.cal-range {
     border-radius: 0;
     transform: none;
-    /* override the scale(1.05) from booking-enhanced.css */
     box-shadow: none;
 }
 
 
 /* ── 2. Hover extension preview band ────────────────────────── */
 
-/*
-   Cells between lastNight (exclusive) and hoverDate (inclusive)
-   show a lighter preview band signalling a potential extension.
-*/
 .enh-days .calendar-day.cal-hover {
     background: var(--cal-hover-bg, rgba(37, 99, 235, 0.07));
     color: #1d4ed8;
     border-radius: 0;
-    /* flush — reads as a continuous band */
     transform: none;
     box-shadow: none;
 }
 
-/*
-   The rightmost cell of the hover band gets a right cap and
-   slightly higher opacity to mark the potential new last-night.
-*/
 .enh-days .calendar-day.cal-hover-end {
     background: rgba(37, 99, 235, 0.14);
     color: #1d4ed8;
@@ -74,26 +53,9 @@
     border-radius: 0 8px 8px 0;
 }
 
-/*
-   When the check-in cell directly borders the hover band
-   (i.e. hoverDate = lastNight + 1, single extension),
-   give the check-in's right edge a left-cap shape so the
-   committed selection and the preview band read as one unit.
 
-   This is handled automatically via cal-start:not(.cal-end) above —
-   no extra rule needed.
-*/
+/* ── 3. Pop animation ───────────────────────────────────────── */
 
-
-/* ── 3. Ensure checkout date cell is visually inert ─────────── */
-/*
-   The checkout date (endDate = lastNight + 1) receives NO
-   cal-* selection class from the JS, so it naturally shows as
-   'available'.  No override needed here — documenting by absence.
-*/
-
-
-/* ── 4. Pop animation (click feedback) ──────────────────────── */
 @keyframes calPop {
     0% {
         transform: scale(0.82);
@@ -111,4 +73,193 @@
 .enh-days .calendar-day.just-popped,
 #calendar .calendar-day.just-popped {
     animation: calPop 0.24s var(--b-ease, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+
+/* ── 4. Mobile touch-action fix ─────────────────────────────── */
+
+/*
+   On mobile, the browser starts a scroll gesture if it detects
+   a dragging motion on a touch-capable surface.  Setting
+   touch-action: manipulation on day cells tells the browser
+   "only pan/zoom, no double-tap zoom" — this prevents the
+   300ms click delay without disabling scroll on the page, and
+   stops the browser from eating the first tap as a scroll
+   initiation.
+
+   touch-action: manipulation is safer than touch-action: none
+   because it still allows the page to scroll when the user
+   intentionally scrolls (just not on the cell itself).
+*/
+.enh-days .calendar-day.available {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    /* remove grey flash on iOS */
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/*
+   Also clear it on booked/past so they don't accidentally absorb
+   touches that should scroll the page.
+*/
+.enh-days .calendar-day.booked,
+.enh-days .calendar-day.past,
+.enh-days .calendar-day.other-month {
+    touch-action: auto;
+    pointer-events: none;
+}
+
+/*
+   Whole grid: allow normal vertical scroll outside cells.
+*/
+.enh-days {
+    touch-action: pan-y;
+}
+
+
+/* ── 5. Fallback input row ──────────────────────────────────── */
+
+/*
+   A compact, premium row of editable date inputs placed directly
+   below the calendar panels.  Serves as:
+     • a manual entry fallback when touch interaction fails
+     • a clear visual confirmation of the current selection
+     • a way to correct/adjust dates without tapping the calendar
+*/
+
+.enh-fallback-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+    padding: 16px 18px;
+    background: var(--b-light, #f9fafb);
+    border: 1px solid var(--b-border, #e5e7eb);
+    border-radius: 12px;
+    align-items: flex-end;
+    position: relative;
+}
+
+.enh-fb-field {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 130px;
+    min-width: 110px;
+    gap: 5px;
+}
+
+.enh-fb-duration {
+    flex: 0 1 110px;
+}
+
+.enh-fb-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--b-muted, #6b7280);
+    pointer-events: none;
+}
+
+.enh-fb-input {
+    border: 1.5px solid var(--b-border, #e5e7eb);
+    border-radius: 8px;
+    padding: 9px 11px;
+    font-family: var(--b-font, system-ui, sans-serif);
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--b-dark, #111827);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    /* Prevent iOS date picker from overflowing */
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.enh-fb-input:focus {
+    border-color: var(--b-primary, #198754);
+    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
+}
+
+/* Read-only duration field */
+.enh-fb-readonly {
+    background: var(--b-accent, #f0fdf4);
+    border-color: rgba(25, 135, 84, 0.2);
+    color: var(--b-primary, #198754);
+    font-weight: 600;
+    cursor: default;
+    text-align: center;
+}
+
+.enh-fb-readonly:focus {
+    box-shadow: none;
+    border-color: rgba(25, 135, 84, 0.2);
+}
+
+/* Error message */
+.enh-fb-error {
+    display: none;
+    width: 100%;
+    flex: 1 1 100%;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #ef4444;
+    padding: 4px 2px 0;
+    line-height: 1.4;
+}
+
+/* Divider label between calendar and fallback row */
+.enh-fallback-divider {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--b-muted, #6b7280);
+    margin-top: 20px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.enh-fallback-divider::before,
+.enh-fallback-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--b-border, #e5e7eb);
+}
+
+
+/* ── 6. Responsive adjustments ───────────────────────────────── */
+
+@media (max-width: 480px) {
+    .enh-fallback-row {
+        gap: 8px;
+        padding: 13px 14px;
+    }
+
+    .enh-fb-field {
+        flex: 1 1 calc(50% - 4px);
+        min-width: 0;
+    }
+
+    .enh-fb-duration {
+        flex: 1 1 100%;
+    }
+
+    .enh-fb-input {
+        font-size: 0.82rem;
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .enh-fb-field {
+        flex: 1 1 100%;
+    }
 }

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Account | Alina 906 Vibes</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <a href="index.html" class="brand-name">Alina<span>906</span>Vibes</a>
+            <div class="brand-sub">Premium Rentals · Nairobi</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Main</div>
+            <a class="nav-item active" href="#" data-action="dashboard"><span class="icon">⊞</span> Dashboard</a>
+            <a class="nav-item" href="my_booking.html" data-action="bookings"><span class="icon">📅</span> My
+                Bookings</a>
+            <a class="nav-item" href="index.html" data-action="browse"><span class="icon">🏠</span> Browse Units</a>
+            <div class="nav-label">Account</div>
+            <a class="nav-item" href="#" data-action="profile"><span class="icon">👤</span> Edit Profile</a>
+            <a class="nav-item" href="my_booking.html" data-action="payments"><span class="icon">🔑</span> Change
+                Password</a>
+            <a class="nav-item" href="#" data-action="security"><span class="icon">🛡️</span> Security (2FA)</a>
+            <a class="nav-item" href="#" data-action="notifications"><span class="icon">🔔</span> Notifications</a>
+            <a class="nav-item" href="#" data-action="settings"><span class="icon">⚙️</span> Account Settings</a>
+            <div class="nav-label">Other</div>
+            <a class="nav-item" href="#" data-action="contact"><span class="icon">💬</span> Contact Us</a>
+            <a class="nav-item danger" href="#" data-action="signout"><span class="icon">🚪</span> Sign Out</a>
+        </nav>
+        <div class="sidebar-user">
+            <div class="avatar" id="sidebarAvatar">?</div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarName">Loading…</div>
+                <div class="user-email" id="sidebarEmail">—</div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- MAIN -->
+    <main class="main">
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="topbar-menu-btn" id="sidebarToggle" aria-label="Toggle menu">☰</button>
+                <div class="page-eyebrow">Member Dashboard</div>
+            </div>
+            <div class="topbar-actions">
+                <div class="badge" id="verifiedBadge">✦ Member</div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="page-header">
+                <div class="page-title" id="welcomeName">Welcome back.</div>
+                <div class="page-subtitle">Here's everything about your stay at a glance.</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card green">
+                    <div class="stat-label">Active Booking</div>
+                    <div class="stat-value" id="statActiveCount">0</div>
+                    <div class="stat-change" id="statActiveDetail">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Stays</div>
+                    <div class="stat-value" id="statTotalStays">0</div>
+                    <div class="stat-change" style="color:var(--text-muted)" id="statStaysDetail">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Nights Booked</div>
+                    <div class="stat-value" id="statNights">0</div>
+                    <div class="stat-change" style="color:var(--text-muted)" id="statNightsDetail">—</div>
+                </div>
+            </div>
+
+            <!-- Active Check-In -->
+            <div class="checkin-card" id="activeStayCard" style="display:none;">
+                <div class="checkin-eyebrow">Active Stay</div>
+                <div class="checkin-title" id="activeUnitName">—</div>
+                <div class="checkin-sub" id="activeUnitSub">—</div>
+                <div class="checkin-code-wrap">
+                    <div>
+                        <div class="code-label">Secure Check-In Code</div>
+                        <div class="code-value" id="activeCode">— — — —</div>
+                    </div>
+                    <button class="code-btn" id="copyCodeBtn">Copy Code</button>
+                </div>
+                <div class="checkin-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Check-In</div>
+                        <div class="meta-value" id="activeCheckin">—</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Check-Out</div>
+                        <div class="meta-value" id="activeCheckout">—</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Nights</div>
+                        <div class="meta-value" id="activeNights">—</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Status</div>
+                        <div class="meta-value" id="activeStatus">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Grid -->
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Booking History</div>
+                        <a href="my_booking.html" class="card-link">View all →</a>
+                    </div>
+                    <div id="bookingsList"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Quick Actions</div>
+                    </div>
+                    <div class="actions-grid">
+                        <a class="action-btn" href="index.html" data-action="new-booking">
+                            <div class="action-icon">📅</div>
+                            <div class="action-text">New Booking</div>
+                        </a>
+                        <a class="action-btn" href="#" data-action="view-invoice">
+                            <div class="action-icon">🧾</div>
+                            <div class="action-text">View Invoice</div>
+                        </a>
+                        <a class="action-btn" href="contact.html" data-action="contact-host">
+                            <div class="action-icon">💬</div>
+                            <div class="action-text">Contact Host</div>
+                        </a>
+                        <a class="action-btn" href="#" data-action="documents">
+                            <div class="action-icon">📄</div>
+                            <div class="action-text">My Documents</div>
+                        </a>
+                        <a class="action-btn" href="#" data-action="change-password">
+                            <div class="action-icon">🔑</div>
+                            <div class="action-text">Change Password</div>
+                        </a>
+                        <a class="action-btn" href="#" data-action="leave-review">
+                            <div class="action-icon">⭐</div>
+                            <div class="action-text">Leave Review</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ══ MODALS ══ -->
+
+    <!-- Edit Profile -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-panel">
+            <div class="modal-head">
+                <h3>Edit Profile</h3><button class="modal-close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <label class="modal-label">Full Name</label>
+                <input type="text" id="editName" class="modal-input" placeholder="Your name" />
+                <label class="modal-label">Email Address</label>
+                <input type="email" id="editEmail" class="modal-input" placeholder="you@example.com" />
+                <div id="profileMsg" class="modal-msg"></div>
+                <button class="modal-btn" id="profileSaveBtn" onclick="handleProfileSave()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password -->
+    <div class="modal-overlay" id="passwordModal">
+        <div class="modal-panel">
+            <div class="modal-head">
+                <h3>Change Password</h3><button class="modal-close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <label class="modal-label">Current Password</label>
+                <input type="password" id="currentPw" class="modal-input" placeholder="Enter current password" />
+                <label class="modal-label">New Password</label>
+                <input type="password" id="newPw" class="modal-input" placeholder="Enter new password" />
+                <label class="modal-label">Confirm New Password</label>
+                <input type="password" id="confirmPw" class="modal-input" placeholder="Confirm new password" />
+                <div id="pwMsg" class="modal-msg"></div>
+                <button class="modal-btn" id="pwSaveBtn" onclick="handlePasswordChange()">Update Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security / 2FA -->
+    <div class="modal-overlay" id="securityModal">
+        <div class="modal-panel">
+            <div class="modal-head">
+                <h3>Security</h3><button class="modal-close-btn">✕</button>
+            </div>
+            <div class="modal-body" id="twoFaContent">
+                <p style="color:var(--text-muted);font-size:14px;">Loading security settings…</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Settings (Deactivate / Delete) -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-panel">
+            <div class="modal-head">
+                <h3>Account Settings</h3><button class="modal-close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="danger-zone">
+                    <h4>⚠️ Deactivate Account</h4>
+                    <p>Your account will be disabled. You can contact support to reactivate it later.</p>
+                    <input type="password" id="deactivatePw" class="modal-input"
+                        placeholder="Enter password to confirm" />
+                    <div id="settingsMsg" class="modal-msg"></div>
+                    <button class="modal-btn outline" onclick="handleDeactivate()">Deactivate Account</button>
+                </div>
+                <hr class="modal-divider" />
+                <div class="danger-zone" style="border-color:rgba(192,57,43,0.3);">
+                    <h4>🗑️ Delete Account Permanently</h4>
+                    <p>This action cannot be undone. All your data and bookings will be permanently deleted.</p>
+                    <input type="password" id="deletePw" class="modal-input" placeholder="Enter password" />
+                    <label class="modal-label">Type DELETE to confirm</label>
+                    <input type="text" id="deleteConfirm" class="modal-input" placeholder="DELETE" />
+                    <div id="deleteMsg" class="modal-msg"></div>
+                    <button class="modal-btn danger" onclick="handleDeleteAccount()">Delete My Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

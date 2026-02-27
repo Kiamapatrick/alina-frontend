@@ -1,32 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KYC Approved | Alina 906 Vibes</title>
-
-  <link rel="stylesheet" href="css/kyc-result.css" />
+  <title>Verified — Alina 906 Vibes</title>
+  <link rel="stylesheet" href="css/kyc-luxury.css" />
 </head>
+
 <body>
 
-  <div class="container">
-    <div class="card">
-      <div class="icon success">✔</div>
+  <div class="kyc-wrap">
 
-      <h1>KYC Approved</h1>
+    <!-- Wordmark -->
+    <div class="kyc-brand">
+      <a href="index.html">Alina<span>906</span>Vibes</a>
+    </div>
 
-      <p class="message">
-        Congratulations. Your identity verification has been approved.
-        You now have full access to the platform.
+    <div class="kyc-card">
+
+      <!-- Icon -->
+      <div class="kyc-icon kyc-icon--success">
+        <svg viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+
+      <span class="kyc-eyebrow">Identity Verified</span>
+      <h1>Welcome,<br><em>you're approved.</em></h1>
+
+      <p class="kyc-message">
+        Your identity has been successfully verified. You now have full access to all Alina 906 Vibes features — browse,
+        book, and transact with confidence.
       </p>
 
-      <div class="actions">
-        <a href="login.html" class="btn primary">Login</a>
+      <div class="kyc-rule"></div>
+
+      <span class="kyc-section-label">What's unlocked</span>
+      <ul class="kyc-list">
+        <li>
+          <svg viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Browse and book from all available verified properties</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span><strong>On-chain confirmations</strong> — every booking secured by smart contract</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Instant wallet-connected payments via Polygon Amoy</span>
+        </li>
+      </ul>
+
+      <div class="kyc-actions">
+        <a href="login.html" class="kyc-btn kyc-btn--primary">Enter the Platform</a>
       </div>
+
     </div>
+
   </div>
 
   <script src="js/kyc-approved.js"></script>
-
 </body>
+
 </html>

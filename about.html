@@ -8,14 +8,18 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     crossorigin="anonymous" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/new.css" />
   <link rel="stylesheet" href="css/navbar.css" />
   <link rel="stylesheet" href="css/about.css" />
+  <link rel="stylesheet" href="css/avatar-dropdown.css" />
 </head>
 
 <body>
 
-  <!-- ═══ Premium Navbar ═══ -->
+  <!-- ═══ Premium Navbar (UNTOUCHED) ═══ -->
   <nav id="mainNavbar" class="alina-navbar">
     <div class="navbar-inner">
       <div class="navbar-row1">
@@ -41,15 +45,18 @@
             </div>
           </div>
           <div id="avatarDropdown" class="avatar-area" style="display:none;">
-            <button class="avatar-btn" id="avatarToggle">
+            <button class="avatar-btn" id="avatarToggle" aria-haspopup="true" aria-expanded="false"
+              aria-label="Account menu">
               <span class="avatar-initials" id="avatarInitials">?</span>
               <span class="avatar-name" id="avatarName">User</span>
+              <!-- JS appends .avatar-caret SVG and .avatar-notif-dot here -->
             </button>
-            <div class="avatar-menu" id="avatarMenu">
+            <div class="avatar-menu" id="avatarMenu" role="menu">
               <a href="my_booking.html" class="avatar-menu-item">📋 My Bookings</a>
-              <a href="#" class="avatar-menu-item">👤 Account</a>
-              <div class="avatar-menu-item kyc-status-item">🛡️ KYC Status <span id="kycBadge"
-                  class="kyc-badge">—</span></div>
+              <a href="dashboard.html" class="avatar-menu-item">👤 Account</a>
+              <div class="avatar-menu-item kyc-status-item">
+                🛡️ KYC Status <span id="kycBadge" class="kyc-badge">—</span>
+              </div>
               <hr class="avatar-menu-divider">
               <button id="logoutBtn" class="avatar-menu-item logout-item">🚪 Log Out</button>
             </div>
@@ -59,126 +66,207 @@
     </div>
   </nav>
 
+  <main>
 
-  <main class="py-5">
-    <div class="container">
-      <section class="text-center mb-5">
-        <h1 class="fw-bold mb-3">About Alina906Vibes</h1>
-        <p class="lead text-muted">
-          Where technology meets hospitality — secure, transparent and borderless vacation rentals for the modern
-          traveler.
+    <!-- ═══ 1. CINEMATIC HERO ═══ -->
+    <section class="about-hero">
+      <div class="about-hero-overlay"></div>
+      <div class="about-hero-grid"></div>
+      <div class="about-hero-orb about-hero-orb--1"></div>
+      <div class="about-hero-orb about-hero-orb--2"></div>
+      <div class="about-hero-rule"></div>
+
+      <div class="about-hero-content">
+        <span class="about-eyebrow">Alina906Vibes · Est. 2025</span>
+        <h1>Redefining<br><em>luxury stays.</em></h1>
+        <p>
+          Secure. Transparent. Powered by smart contracts and designed for modern travelers who value privacy and trust.
         </p>
-      </section>
-
-      <section class="row align-items-center mb-5">
-        <div class="col-md-6 mb-4 mb-md-0">
-          <img src="img/markus-winkler-0a1EeA7zQ90-unsplash.jpg" class="img-fluid rounded shadow-sm"
-            alt="Smart Contract Illustration" />
+        <div class="about-hero-scroll">
+          <div class="about-hero-scroll-bar"></div>
+          <span>Discover</span>
         </div>
-        <div class="col-md-6">
-          <h3 class="fw-semibold mb-3 text-success">Powered by Smart Contracts</h3>
-          <p>
-            Every booking on Alina906Vibes is secured by a blockchain smart contract, ensuring fair payments and
-            automated refunds.
-            Our latest contract (<strong>RentalPaymentsV11_PartialRefunds</strong>) manages all crypto transactions
-            transparently on-chain.
-          </p>
-          <ul class="list-unstyled ms-3">
-            <li>✔️ Immutable and secure records</li>
-            <li>✔️ Automatic partial refunds when applicable</li>
-            <li>✔️ Owner-verified payment integrity</li>
-          </ul>
-        </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="py-5 bg-light">
-        <div class="container">
-          <div class="row align-items-center gy-4 flex-md-row-reverse">
+    <!-- ═══ 2. INTRO ═══ -->
+    <section class="about-intro reveal">
+      <div class="about-intro-inner">
+        <span class="about-label">Our Mission</span>
+        <h2 class="about-intro-headline">Where technology<br>meets hospitality.</h2>
+        <p class="about-intro-body">
+          Secure, transparent and borderless vacation rentals for the modern traveler. We believe the future of travel
+          should be built on trust — not paperwork — powered by the permanence of the blockchain and the warmth of
+          world-class hospitality.
+        </p>
+      </div>
+    </section>
 
-            <!-- Image Column -->
-            <div class="col-md-6 text-center">
-              <img src="img/ze-vieira-sr927_EVdqk-unsplash.jpg" class="img-fluid rounded-4 shadow"
-                alt="Payment Options" />
-            </div>
+    <!-- ═══ 3. SMART CONTRACT ═══ -->
+    <section class="about-contract reveal">
+      <div class="about-contract-inner">
 
-            <!-- Text Column -->
-            <div class="col-md-6">
-              <h2 class="fw-bold mb-3 text-success">
-                Seamless Payment Flexibility
-              </h2>
-
-              <p class="text-muted fs-5">
-                We believe everyone should be able to book their stay with ease.
-                That’s why we support multiple payment methods — from everyday
-                solutions like <strong>Mpesa</strong> and <strong>Visa</strong>
-                to cutting-edge crypto payments through your connected wallet.
-              </p>
-
-              <!-- Payment Icons -->
-              <div class="row mt-4 gy-4">
-
-                <!-- Mpesa -->
-                <div class="col-md-4">
-                  <div class="p-3 border rounded-4 h-100 text-center shadow-sm">
-                    <h6 class="fw-bold text-success">Mpesa</h6>
-                    <p class="text-muted small mb-3">
-                      Pay instantly using Kenya’s most trusted mobile money platform.
-                      Fast, secure and convenient.
-                    </p>
-                    <img src="img/omid-armin-8Nppe0yLmn8-unsplash.jpg" alt="Mpesa" class="img-fluid"
-                      style="height: 60px; object-fit: contain;">
-                  </div>
-                </div>
-
-                <!-- Visa -->
-                <div class="col-md-4">
-                  <div class="p-3 border rounded-4 h-100 text-center shadow-sm">
-                    <h6 class="fw-bold text-primary">Visa</h6>
-                    <p class="text-muted small mb-3">
-                      Use your debit or credit card for seamless and globally accepted payments.
-                    </p>
-                    <img src="img/rupixen-Q59HmzK38eQ-unsplash.jpg" alt="Visa" class="img-fluid"
-                      style="height: 60px; object-fit: contain;">
-                  </div>
-                </div>
-
-                <!-- Crypto -->
-                <div class="col-md-4">
-                  <div class="p-3 border rounded-4 h-100 text-center shadow-sm">
-                    <h6 class="fw-bold text-dark">Crypto</h6>
-                    <p class="text-muted small mb-3">
-                      Pay securely using your connected wallet with blockchain-backed transactions.
-                    </p>
-                    <img src="img/kanchanara-7cmA9ZL5dDk-unsplash.jpg" alt="Crypto" class="img-fluid"
-                      style="height: 60px; object-fit: contain;">
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
+        <div class="about-contract-image">
+          <div class="about-img-frame">
+            <img src="img/markus-winkler-0a1EeA7zQ90-unsplash.jpg" alt="Smart Contract" />
           </div>
         </div>
-      </section>
 
-      <section class="text-center py-5 bg-light rounded shadow-sm">
-        <h3 class="fw-semibold mb-3">Future-Oriented Hospitality</h3>
-        <p class="mb-4">
-          Alina906Vibes is more than a rental platform — it’s a step toward the decentralized travel economy.
-          By combining blockchain transparency, AI-driven booking analytics and traditional payment reliability,
-          we’re creating the next generation of travel experiences.
+        <div class="about-contract-text">
+          <span class="about-label">Infrastructure</span>
+          <h2>Powered by<br><em>smart contracts.</em></h2>
+          <p>
+            Every booking on Alina906Vibes is secured by a blockchain smart contract, ensuring fair payments and
+            automated refunds. Our latest contract — <strong>RentalPaymentsV11_PartialRefunds</strong> — manages all
+            crypto transactions transparently on-chain.
+          </p>
+
+          <ul class="about-feature-list">
+            <li>
+              <div class="about-feature-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div>
+                <strong>Immutable records</strong>
+                <span>Every transaction permanently written on-chain</span>
+              </div>
+            </li>
+            <li>
+              <div class="about-feature-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <div>
+                <strong>Automatic partial refunds</strong>
+                <span>Smart logic handles cancellations fairly</span>
+              </div>
+            </li>
+            <li>
+              <div class="about-feature-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+              <div>
+                <strong>Owner-verified integrity</strong>
+                <span>Zero intermediaries, full transparency</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══ 4. PAYMENTS ═══ -->
+    <section class="about-payments reveal">
+      <div class="about-payments-inner">
+
+        <div class="about-payments-text">
+          <span class="about-label">Flexibility</span>
+          <h2>Seamless<br><em>payment options.</em></h2>
+          <p>
+            We believe everyone should be able to book their stay with ease. That's why we support multiple payment
+            methods — from everyday solutions to cutting-edge crypto payments through your connected wallet.
+          </p>
+        </div>
+
+        <div class="about-payments-image">
+          <div class="about-img-frame">
+            <img src="img/ze-vieira-sr927_EVdqk-unsplash.jpg" alt="Payment Options" />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Payment cards -->
+      <div class="about-pay-grid">
+
+        <div class="about-pay-card reveal-stagger">
+          <div class="about-pay-card-top">
+            <span class="about-pay-label">Mpesa</span>
+            <div class="about-pay-dot about-pay-dot--green"></div>
+          </div>
+          <img src="img/omid-armin-8Nppe0yLmn8-unsplash.jpg" alt="Mpesa" />
+          <p>Kenya's most trusted mobile money platform. Fast, secure and instant.</p>
+        </div>
+
+        <div class="about-pay-card reveal-stagger" style="--stagger: 0.12s">
+          <div class="about-pay-card-top">
+            <span class="about-pay-label">Visa</span>
+            <div class="about-pay-dot about-pay-dot--blue"></div>
+          </div>
+          <img src="img/rupixen-Q59HmzK38eQ-unsplash.jpg" alt="Visa" />
+          <p>Debit or credit — globally accepted for seamless checkout.</p>
+        </div>
+
+        <div class="about-pay-card reveal-stagger" style="--stagger: 0.24s">
+          <div class="about-pay-card-top">
+            <span class="about-pay-label">Crypto</span>
+            <div class="about-pay-dot about-pay-dot--amber"></div>
+          </div>
+          <img src="img/kanchanara-7cmA9ZL5dDk-unsplash.jpg" alt="Crypto" />
+          <p>Blockchain-backed wallet payments secured by smart contract.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══ 5. CLOSING CTA ═══ -->
+    <section class="about-cta reveal">
+      <div class="about-cta-bg"></div>
+      <div class="about-cta-grid"></div>
+      <div class="about-cta-inner">
+        <span class="about-label about-label--light">The Future of Travel</span>
+        <h2>Future-oriented<br><em>hospitality.</em></h2>
+        <p>
+          Alina906Vibes is more than a rental platform — it's a step toward the decentralized travel economy. Combining
+          blockchain transparency, AI-driven booking analytics and traditional payment reliability, we're building the
+          next generation of travel experiences.
         </p>
-        <a href="index.html" class="btn btn-success btn-lg">Explore Rentals</a>
-      </section>
-    </div>
+        <a href="index.html" class="about-cta-btn">
+          <span class="about-cta-btn-line"></span>
+          Explore Rentals
+        </a>
+      </div>
+    </section>
+
   </main>
 
-  <footer class="text-center py-4 border-top">
+  <!-- Footer -->
+  <footer class="about-footer">
     <small>© 2025 Alina906Vibes — Smart. Secure. Future-Ready.</small>
   </footer>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     crossorigin="anonymous"></script>
   <script src="js/nav.js"></script>
+
+  <script>
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.style.getPropertyValue('--stagger') || '0s';
+          entry.target.style.transitionDelay = delay;
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    revealEls.forEach(el => observer.observe(el));
+  </script>
+
 </body>
 
 </html>

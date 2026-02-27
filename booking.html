@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/booking-enhanced.css" />
   <link rel="stylesheet" href="css/booking-hero-premium.css" />
   <link rel="stylesheet" href="css/calendar-selection-patch.css" />
+  <link rel="stylesheet" href="css/avatar-dropdown.css" />
 </head>
 
 <body class="booking-page">
@@ -47,15 +48,18 @@
             </div>
           </div>
           <div id="avatarDropdown" class="avatar-area" style="display:none;">
-            <button class="avatar-btn" id="avatarToggle">
+            <button class="avatar-btn" id="avatarToggle" aria-haspopup="true" aria-expanded="false"
+              aria-label="Account menu">
               <span class="avatar-initials" id="avatarInitials">?</span>
               <span class="avatar-name" id="avatarName">User</span>
+              <!-- JS appends .avatar-caret SVG and .avatar-notif-dot here -->
             </button>
-            <div class="avatar-menu" id="avatarMenu">
+            <div class="avatar-menu" id="avatarMenu" role="menu">
               <a href="my_booking.html" class="avatar-menu-item">📋 My Bookings</a>
-              <a href="#" class="avatar-menu-item">👤 Account</a>
-              <div class="avatar-menu-item kyc-status-item">🛡️ KYC Status <span id="kycBadge"
-                  class="kyc-badge">—</span></div>
+              <a href="dashboard.html" class="avatar-menu-item">👤 Account</a>
+              <div class="avatar-menu-item kyc-status-item">
+                🛡️ KYC Status <span id="kycBadge" class="kyc-badge">—</span>
+              </div>
               <hr class="avatar-menu-divider">
               <button id="logoutBtn" class="avatar-menu-item logout-item">🚪 Log Out</button>
             </div>
