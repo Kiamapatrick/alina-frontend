@@ -1,0 +1,114 @@
+/* ═══════════════════════════════════════════════════════════════
+   calendar-selection-patch.css
+   Load AFTER booking-enhanced.css.
+
+   Provides precise border-radius shaping for the selection band
+   and hover extension preview used by calendar-enhanced.js.
+   ═══════════════════════════════════════════════════════════════ */
+
+
+/* ── 1. Selection band shaping ──────────────────────────────── */
+
+/*
+   Single-night  (cal-start + cal-end on same cell):
+   Fully rounded pill — no connection to adjacent cells.
+*/
+.enh-days .calendar-day.cal-selected.cal-start.cal-end,
+#calendar .calendar-day.cal-selected.cal-start.cal-end {
+    border-radius: 8px !important;
+}
+
+/*
+   Multi-night check-in cell (left cap):
+   Right side flush so it visually connects to the range band.
+*/
+.enh-days .calendar-day.cal-start:not(.cal-end),
+#calendar .calendar-day.cal-start:not(.cal-end) {
+    border-radius: 8px 0 0 8px;
+}
+
+/*
+   Multi-night last-night cell (right cap):
+   Left side flush so it connects to the range band.
+*/
+.enh-days .calendar-day.cal-end:not(.cal-start),
+#calendar .calendar-day.cal-end:not(.cal-start) {
+    border-radius: 0 8px 8px 0;
+}
+
+/*
+   Mid-range cells: no rounding — seamless band.
+*/
+.enh-days .calendar-day.cal-range,
+#calendar .calendar-day.cal-range {
+    border-radius: 0;
+    transform: none;
+    /* override the scale(1.05) from booking-enhanced.css */
+    box-shadow: none;
+}
+
+
+/* ── 2. Hover extension preview band ────────────────────────── */
+
+/*
+   Cells between lastNight (exclusive) and hoverDate (inclusive)
+   show a lighter preview band signalling a potential extension.
+*/
+.enh-days .calendar-day.cal-hover {
+    background: var(--cal-hover-bg, rgba(37, 99, 235, 0.07));
+    color: #1d4ed8;
+    border-radius: 0;
+    /* flush — reads as a continuous band */
+    transform: none;
+    box-shadow: none;
+}
+
+/*
+   The rightmost cell of the hover band gets a right cap and
+   slightly higher opacity to mark the potential new last-night.
+*/
+.enh-days .calendar-day.cal-hover-end {
+    background: rgba(37, 99, 235, 0.14);
+    color: #1d4ed8;
+    font-weight: 600;
+    border-radius: 0 8px 8px 0;
+}
+
+/*
+   When the check-in cell directly borders the hover band
+   (i.e. hoverDate = lastNight + 1, single extension),
+   give the check-in's right edge a left-cap shape so the
+   committed selection and the preview band read as one unit.
+
+   This is handled automatically via cal-start:not(.cal-end) above —
+   no extra rule needed.
+*/
+
+
+/* ── 3. Ensure checkout date cell is visually inert ─────────── */
+/*
+   The checkout date (endDate = lastNight + 1) receives NO
+   cal-* selection class from the JS, so it naturally shows as
+   'available'.  No override needed here — documenting by absence.
+*/
+
+
+/* ── 4. Pop animation (click feedback) ──────────────────────── */
+@keyframes calPop {
+    0% {
+        transform: scale(0.82);
+    }
+
+    60% {
+        transform: scale(1.13);
+    }
+
+    100% {
+        transform: scale(1.05);
+    }
+}
+
+.enh-days .calendar-day.just-popped,
+#calendar .calendar-day.just-popped {
+    animation: calPop 0.24s var(--b-ease, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}

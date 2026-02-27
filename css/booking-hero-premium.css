@@ -1,0 +1,580 @@
+/* ═══════════════════════════════════════════════════════════════
+   booking-hero-premium.css
+   Luxury layered scroll — hero stays fixed, content slides over.
+   Load AFTER all other booking CSS files.
+   GPU-friendly: uses only transform, opacity, will-change.
+   Does NOT touch booking logic or JS IDs.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Import a refined display font ── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+/* ─────────────────────────────────────────────────
+   1. HERO — Fixed behind, content overlays on scroll
+   ───────────────────────────────────────────────── */
+
+/* Hero is position:sticky so it holds at the top
+   while booking-content scrolls over it.            */
+.booking-hero {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    height: 100svh;
+    /* full viewport on load   */
+    max-height: 680px;
+    /* cap on tall screens     */
+    overflow: hidden;
+    border-radius: 0;
+    margin-bottom: 0;
+    will-change: transform;
+}
+
+/* Gallery fills hero completely */
+.booking-hero .gallery-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 50% 50%;
+    gap: 3px;
+    width: 100%;
+    height: 100%;
+    border-radius: 0 !important;
+    border: none !important;
+    /* Subtle scale-down driven by JS scroll class */
+    transform: scale(1);
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.5s ease;
+    will-change: transform, filter;
+}
+
+/* When content begins to cover hero, gallery dims slightly */
+.booking-hero.hero-covered .gallery-grid {
+    transform: scale(1.03);
+    filter: brightness(0.78) saturate(0.9);
+}
+
+.booking-hero .gallery-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.booking-hero .gallery-grid img:first-child {
+    grid-row: 1 / 3;
+}
+
+/* Subtle hover on individual cells — desktop only */
+@media (hover: hover) {
+    .booking-hero .gallery-grid img:hover {
+        transform: scale(1.04);
+        z-index: 1;
+    }
+}
+
+/* Gradient overlay — richer, more atmospheric */
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.08) 0%,
+            rgba(0, 0, 0, 0.02) 40%,
+            rgba(0, 0, 0, 0.55) 78%,
+            rgba(0, 0, 0, 0.78) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Hero text — refined DM Serif Display */
+.hero-info {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    z-index: 3;
+    color: #fff;
+}
+
+.hero-info h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.32);
+    line-height: 1.15;
+}
+
+.hero-info .hero-location {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.82;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Scroll indicator — pure atmosphere, no logic */
+.hero-scroll-hint {
+    position: absolute;
+    bottom: 28px;
+    right: 40px;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.55);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.hero-scroll-hint::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 36px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), transparent);
+    animation: scrollLine 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollLine {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scaleY(1);
+    }
+
+    50% {
+        opacity: 0.9;
+        transform: scaleY(1.15);
+    }
+}
+
+/* ─────────────────────────────────────────────────
+   2. CONTENT — Slides OVER the hero with elevation
+   ───────────────────────────────────────────────── */
+
+.booking-content {
+    position: relative;
+    z-index: 10;
+    background: var(--b-light, #f9fafb);
+
+    /* Top rounded corners create the "card sliding over" illusion */
+    border-radius: 24px 24px 0 0;
+    margin-top: -48px;
+    /* pull up to overlap hero slightly */
+
+    /* The dramatic elevation shadow that separates content from hero */
+    box-shadow:
+        0 -4px 0 0 rgba(255, 255, 255, 0.08),
+        0 -12px 40px rgba(0, 0, 0, 0.18),
+        0 0 0 0.5px rgba(255, 255, 255, 0.12);
+
+    /* GPU-friendly entry */
+    will-change: transform;
+    transition: box-shadow 0.4s ease;
+}
+
+/* Thin drag-handle pill — signals "slide up" to mobile users */
+.booking-content::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 100px;
+    background: rgba(0, 0, 0, 0.14);
+    margin: 14px auto 0;
+}
+
+/* Deeper shadow as user scrolls deeper into content */
+.booking-content.content-elevated {
+    box-shadow:
+        0 -4px 0 0 rgba(255, 255, 255, 0.06),
+        0 -24px 60px rgba(0, 0, 0, 0.28),
+        0 0 0 0.5px rgba(255, 255, 255, 0.08);
+}
+
+.booking-grid {
+    padding-top: 24px;
+    /* reduce from 32px — pill provides visual breathing room */
+}
+
+/* ─────────────────────────────────────────────────
+   3. HIGHLIGHTS ROW — Compact, refined, glassy
+   ───────────────────────────────────────────────── */
+
+.highlights-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 0 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    margin-bottom: 28px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.highlights-row::-webkit-scrollbar {
+    display: none;
+}
+
+/* Staggered fade-up — replaces the aggressive slide */
+.highlights-row.visible .highlight-item {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.highlight-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 14px;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 100px;
+    /* pill shape — refined, not boxy */
+    flex: 0 0 auto;
+    white-space: nowrap;
+    cursor: default;
+
+    /* Stagger entrance */
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+        opacity 0.45s ease,
+        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+
+    box-shadow:
+        0 1px 4px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Stagger delays per child */
+.highlights-row .highlight-item:nth-child(1) {
+    transition-delay: 0.06s;
+}
+
+.highlights-row .highlight-item:nth-child(2) {
+    transition-delay: 0.12s;
+}
+
+.highlights-row .highlight-item:nth-child(3) {
+    transition-delay: 0.18s;
+}
+
+.highlights-row .highlight-item:nth-child(4) {
+    transition-delay: 0.24s;
+}
+
+@media (hover: hover) {
+    .highlight-item:hover {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(25, 135, 84, 0.3);
+        box-shadow:
+            0 4px 14px rgba(25, 135, 84, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 1);
+        transform: translateY(-1px) !important;
+    }
+}
+
+.highlight-icon {
+    font-size: 0.9rem;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(25, 135, 84, 0.09);
+    border-radius: 50%;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.highlight-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: var(--b-muted, #6b7280);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin-bottom: 1px;
+}
+
+.highlight-value {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--b-dark, #111827);
+    line-height: 1.1;
+}
+
+/* ─────────────────────────────────────────────────
+   4. SECTION TITLES — DM Serif for warmth
+   ───────────────────────────────────────────────── */
+
+.section-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    color: var(--b-dark, #111827);
+    margin: 0 0 16px;
+}
+
+/* ─────────────────────────────────────────────────
+   5. BOOKING SECTION — Reduce clutter
+   ───────────────────────────────────────────────── */
+
+.booking-section {
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.booking-section:last-child {
+    border-bottom: none;
+}
+
+/* About text — warmer reading experience */
+.about-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #4b5563;
+    font-weight: 300;
+}
+
+/* ─────────────────────────────────────────────────
+   6. AMENITY ITEMS — Lighter, less padding
+   ───────────────────────────────────────────────── */
+
+.amenity-item {
+    padding: 10px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--b-radius-sm, 10px);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 400;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    gap: 10px;
+}
+
+.amenity-item:hover {
+    border-color: rgba(25, 135, 84, 0.25);
+    background: rgba(240, 253, 244, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.08);
+}
+
+.amenity-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 1.05rem;
+    background: rgba(25, 135, 84, 0.07);
+    border-radius: 8px;
+}
+
+/* ─────────────────────────────────────────────────
+   7. JS SCROLL BEHAVIOUR (inline script hook)
+   ───────────────────────────────────────────────── */
+
+/*
+  These classes are toggled by the inline JS below.
+  No logic changes — purely visual state triggers.
+*/
+
+/* ─────────────────────────────────────────────────
+   8. MOBILE — Sticky scroll-over effect preserved
+   ───────────────────────────────────────────────── */
+
+/*
+  KEY PRINCIPLE:
+  position:sticky works by keeping the element pinned relative to
+  the nearest scrolling ancestor that has overflow != hidden/clip.
+  On mobile we keep sticky ON — we just shrink the hero height so
+  less of the viewport is consumed before content appears.
+
+  IMPORTANT — iOS Safari / mobile WebKit:
+  new.css sets `background-attachment: fixed` on <body>. On mobile
+  WebKit this creates a new compositing layer that silently breaks
+  position:sticky on all descendants. We override it to `scroll`
+  on touch devices — the visual difference is imperceptible because
+  the fixed-gradient effect is already degraded on iOS anyway.
+
+  booking2.css sets .booking-hero { overflow: hidden } which is
+  fine — overflow:hidden does NOT break sticky on the element itself,
+  only on its *ancestors* would it break. The page scroll axis is
+  <html>/<body>, so sticky operates correctly here.
+
+  The single remaining issue on mobile was the gallery-grid: booking2.css
+  overrides it to grid-template-columns:1fr at ≤991px, removing the
+  multi-column layout. Since our gallery-grid is position:absolute;inset:0
+  it fills the hero regardless — we just ensure the single-image display
+  from booking2.css doesn't fight our absolute positioning.
+*/
+
+/* ── iOS / Android sticky prerequisite ──
+   background-attachment:fixed breaks position:sticky on mobile WebKit.
+   Switch to scroll on touch-capable screens. Performance is identical
+   on mobile because fixed-attachment gradients are composited separately
+   there anyway and often ignored by the GPU. */
+@media (max-width: 991px),
+(hover: none) {
+    body {
+        background-attachment: scroll;
+    }
+}
+
+@media (max-width: 767px) {
+
+    /* ── Hero: stay sticky, just shorter ── */
+    .booking-hero {
+        /* Keep position:sticky — this is what drives the scroll-over effect.
+       Do NOT override to position:relative here. */
+        position: sticky;
+        top: 0;
+        height: 62svh;
+        max-height: 420px;
+        /* Ensure nothing clips the sticky context */
+        overflow: hidden;
+    }
+
+    /* ── Gallery: single-image fill on mobile ──
+     booking2.css hides all but :first-child at ≤991px and sets a
+     fixed row height. Override so the absolute-positioned grid
+     fills the sticky hero frame cleanly with one full-bleed image. */
+    .booking-hero .gallery-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: 100%;
+    }
+
+    /* Unhide only first image; the absolute fill handles the rest */
+    .booking-hero .gallery-grid img:first-child {
+        grid-row: 1;
+        /* reset the 1/3 span set for desktop */
+        display: block;
+    }
+
+    /* ── Content: slightly less pull-up on small screens ── */
+    .booking-content {
+        border-radius: 20px 20px 0 0;
+        margin-top: -36px;
+        /* Ensure content sits above the sticky hero in paint order */
+        position: relative;
+        z-index: 10;
+    }
+
+    /* ── Hero text: tuck closer to bottom edge ── */
+    .hero-info {
+        bottom: 52px;
+        /* extra room above the content card's rounded lip */
+        left: 20px;
+    }
+
+    .hero-info h1 {
+        font-size: 1.4rem;
+    }
+
+    /* Scroll hint: not needed on touch — hide */
+    .hero-scroll-hint {
+        display: none;
+    }
+
+    /* ── Highlights ── */
+    .highlights-row {
+        padding-bottom: 16px;
+        margin-bottom: 20px;
+        gap: 6px;
+    }
+
+    .highlight-item {
+        padding: 7px 12px;
+    }
+
+    .highlight-icon {
+        width: 22px;
+        height: 22px;
+        font-size: 0.8rem;
+    }
+
+    .highlight-label {
+        font-size: 0.58rem;
+    }
+
+    .highlight-value {
+        font-size: 0.78rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
+
+    .booking-grid {
+        padding-top: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .booking-hero {
+        height: 55svh;
+        max-height: 360px;
+    }
+
+    .booking-content {
+        margin-top: -28px;
+        border-radius: 18px 18px 0 0;
+    }
+
+    .hero-info {
+        bottom: 48px;
+    }
+
+    /* On very small screens, allow horizontal scroll on highlights */
+    .highlights-row {
+        padding-right: 16px;
+    }
+}
+
+/* ─────────────────────────────────────────────────
+   9. REDUCED MOTION
+   ───────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .booking-hero .gallery-grid,
+    .booking-hero.hero-covered .gallery-grid,
+    .highlight-item,
+    .booking-content {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+        filter: none !important;
+    }
+
+    .highlight-item {
+        opacity: 1 !important;
+    }
+
+    .hero-scroll-hint::after {
+        animation: none;
+    }
+}

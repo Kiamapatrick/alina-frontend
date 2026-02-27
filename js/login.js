@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toggle.addEventListener("click", () => {
       const isPassword = pwField.type === "password";
       pwField.type = isPassword ? "text" : "password";
-      toggle.textContent = isPassword ? "🙈" : "👁";
+      toggle.textContent = isPassword ? "🙈" : "🙊";
     });
   }
 

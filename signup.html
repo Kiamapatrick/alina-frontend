@@ -10,54 +10,117 @@
 </head>
 
 <body>
-  <header>
-    <div class="logo" onclick="window.location.href='index.html'">Alina906Vibes</div>
-  </header>
 
-  <main class="auth-container">
-    <div class="auth-box">
-      <h2>Create Account</h2>
-      <p class="auth-subtitle">Join us and start exploring rentals</p>
+  <div class="auth-shell">
 
-      <!-- Status message area -->
-      <div id="statusMsg" class="status-msg"></div>
+    <!-- ══ LEFT — Brand panel ══════════════════════════════════ -->
+    <aside class="auth-brand-panel" aria-hidden="true">
+      <div class="blob-b"></div>
+      <div class="panel-rule"></div>
 
-      <form id="signupForm" novalidate>
-        <div class="form-group">
-          <label for="username">Full Name</label>
-          <span class="input-icon">👤</span>
-          <input type="text" id="username" placeholder="John Doe" required autocomplete="name">
-        </div>
+      <div class="auth-logo" onclick="window.location.href='index.html'" role="link" tabindex="0"
+        aria-label="Go to Alina906Vibes homepage" aria-hidden="false">
+        <span class="auth-logo-name">Alina<span>906</span>Vibes</span>
+        <span class="auth-logo-sub">Premium Rentals · Nairobi</span>
+      </div>
 
-        <div class="form-group">
-          <label for="signupEmail">Email</label>
-          <span class="input-icon">✉</span>
-          <input type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
-        </div>
-
-        <div class="form-group">
-          <label for="signupPassword">Password</label>
-          <span class="input-icon">🔒</span>
-          <input type="password" id="signupPassword" placeholder="Min. 6 characters" required minlength="6"
-            autocomplete="new-password">
-          <button type="button" class="password-toggle" aria-label="Toggle password visibility">👁</button>
-        </div>
-
-        <button type="submit" class="auth-btn" id="signupBtn">
-          <span class="spinner"></span>
-          <span class="btn-text">Create Account</span>
-        </button>
-
-        <p class="auth-link">Already have an account?
-          <a href="login.html">Sign In</a>
+      <div class="auth-panel-body">
+        <p class="auth-panel-eyebrow">New member</p>
+        <h2 class="auth-panel-headline">
+          Begin your<br>
+          <em>curated</em><br>
+          experience.
+        </h2>
+        <p>
+          Create an account to unlock verified rentals, seamless payments, and
+          instant check-in access codes delivered to your phone.
         </p>
-      </form>
-    </div>
-  </main>
+      </div>
 
-  <footer>
-    <p>&copy; 2025 Alina906Vibes</p>
+      <div class="auth-badges">
+        <div class="auth-badge">
+          <span class="auth-badge-icon">✅</span>
+          Free to join
+        </div>
+        <div class="auth-badge">
+          <span class="auth-badge-icon">🔗</span>
+          Crypto &amp; M-Pesa
+        </div>
+        <div class="auth-badge">
+          <span class="auth-badge-icon">⭐</span>
+          Verified stays
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══ RIGHT — Form panel ═══════════════════════════════════ -->
+    <main class="auth-form-panel">
+      <div class="auth-box">
+
+        <p class="auth-form-eyebrow">Get started</p>
+        <h2>Create account</h2>
+        <p class="auth-subtitle">Join thousands of happy guests in Nairobi</p>
+
+        <div id="statusMsg" class="status-msg"></div>
+
+        <form id="signupForm" novalidate>
+
+          <div class="form-group">
+            <label for="username">Full name</label>
+            <div class="field-wrap">
+              <span class="input-icon" aria-hidden="true">👤</span>
+              <input type="text" id="username" placeholder="Jane Doe" required autocomplete="name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="signupEmail">Email address</label>
+            <div class="field-wrap">
+              <span class="input-icon" aria-hidden="true">✉️</span>
+              <input type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <div class="field-wrap">
+              <span class="input-icon" aria-hidden="true">🔒</span>
+              <input type="password" id="signupPassword" placeholder="Min. 6 characters" required minlength="6"
+                autocomplete="new-password">
+              <button type="button" class="password-toggle" aria-label="Toggle password visibility">👁️</button>
+            </div>
+          </div>
+
+          <button type="submit" class="auth-btn" id="signupBtn">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="btn-text">Create Account</span>
+          </button>
+
+          <p class="auth-link">
+            Already have an account? <a href="login.html">Sign In</a>
+          </p>
+
+        </form>
+      </div>
+    </main>
+
+  </div><!-- /auth-shell -->
+
+  <footer class="auth-footer">
+    &copy; 2025 Alina906Vibes — Built on Polygon Amoy Testnet
   </footer>
+
+  <script>
+    /* ── Password toggle ── */
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = btn.closest('.field-wrap').querySelector('input');
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        btn.textContent = isHidden ? '🙈' : '👁️';
+      });
+    });
+  </script>
 
   <script src="js/signup.js"></script>
 </body>
